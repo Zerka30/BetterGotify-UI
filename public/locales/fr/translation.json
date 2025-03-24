@@ -1,4 +1,9 @@
 {
+    "footer": {
+        "copyright": "© {{year}} BetterGotify UI. Tous droits réservés.",
+        "version": "Version du serveur: v{{version}}",
+        "website": "Site officiel"
+    },
     "auth": {
         "connectTo": "Connexion à Gotify",
         "username": "Nom d'utilisateur",
