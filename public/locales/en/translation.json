@@ -14,6 +14,7 @@
         "connectTo": "Connect to Gotify",
         "username": "Username",
         "password": "Password",
-        "login": "Login"
+        "login": "Login",
+        "logout": "Logout"
     }
 }
