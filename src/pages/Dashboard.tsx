@@ -31,7 +31,6 @@ const Dashboard = () => {
 
     // State for application management
     const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-    const [appToDelete, setAppToDelete] = useState<Application | null>(null);
 
     // Translation
     const { t } = useTranslation();
@@ -218,14 +217,6 @@ const Dashboard = () => {
         } finally {
             setIsLoading(false);
         }
-    };
-
-    /**
-     * Prepare application deletion
-     */
-    const handleDeleteApp = (app: Application): void => {
-        setAppToDelete(app);
-        setIsConfirmModalOpen(true);
     };
 
     // Initial loading
