@@ -1,0 +1,8 @@
+{
+    "auth": {
+        "connectTo": "Connect to Gotify",
+        "username": "Username",
+        "password": "Password",
+        "login": "Login"
+    }
+}
