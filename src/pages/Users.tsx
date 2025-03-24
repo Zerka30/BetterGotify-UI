@@ -23,13 +23,14 @@ const Users: React.FC = () => {
         setError(null);
         try {
             const fetchedUsers = await userService.getUsers();
-            setUsers(fetchedUsers);
+            setUsers(Array.isArray(fetchedUsers) ? fetchedUsers : []);
         } catch (err) {
             if (err instanceof ApiError) {
                 setError(t('common.error') + ' ' + err.status + ': ' + err.message);
             } else {
                 setError(t('users.errors.loadingFailed'));
             }
+            setUsers([]);
         } finally {
             setIsLoading(false);
         }
