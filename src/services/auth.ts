@@ -11,13 +11,11 @@ export const authService = {
         try {
             const basicAuth = btoa(`${username}:${password}`);
 
-            const response = await fetch(`${API_CONFIG.BASE_URL}/client`, {
+            const response = await fetch(API_CONFIG.endpoints.login, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Basic ${basicAuth}`,
-                    'Origin': 'https://gotify.zerka.dev',
-                    'Referer': 'https://gotify.zerka.dev/'
                 },
                 body: JSON.stringify({
                     name: "BetterGotify UI"
@@ -57,8 +55,6 @@ export const authService = {
         return {
             'X-Gotify-Key': token,
             'Content-Type': 'application/json',
-            'Origin': 'https://gotify.zerka.dev',
-            'Referer': 'https://gotify.zerka.dev/'
         };
     },
 

@@ -91,7 +91,6 @@ export const apiService = {
                 method: 'POST',
                 headers: {
                     'X-Gotify-Key': authService.getToken() || '',
-                    // Ne pas définir Content-Type, le navigateur le fera automatiquement
                 },
                 body: formData,
                 credentials: 'include'

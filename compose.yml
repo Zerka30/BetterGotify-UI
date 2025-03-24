@@ -1,0 +1,23 @@
+---
+services:
+  gotify:
+    image: gotify/server:latest
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Paris
+      GOTIFY_SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./configs/gotify.yml:/etc/gotify/config.yml
+  bettergotify:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8001:80"
+    environment:
+      GOTIFY_URL: http://gotify:8080
+    depends_on:
+      - gotify

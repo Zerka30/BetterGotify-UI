@@ -1,0 +1,33 @@
+server:
+  cors:
+    alloworigins:
+      - "http://localhost:8001"
+      - "http://127.0.0.1:8001"
+    allowmethods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+    allowheaders:
+      - "Authorization"
+      - "Content-Type"
+      - "X-Gotify-Key"
+      - "Accept"
+      - "Accept-Language"
+      - "Accept-Encoding"
+      - "Referer"
+      - "Connection"
+      - "Sec-Fetch-Dest"
+      - "Sec-Fetch-Mode"
+      - "Sec-Fetch-Site"
+      - "Priority"
+    exposeheaders:
+      - "Content-Type"
+      - "X-Gotify-Key"
+    allowcredentials: true
+    maxage: 86400
+  responseheaders:
+    access-control-allow-origin: "*"
+    access-control-allow-headers: "X-Gotify-Key,Authorization,Content-Type,Accept"
+    access-control-allow-methods: "GET,POST,PUT,DELETE,OPTIONS"
