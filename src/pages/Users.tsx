@@ -1,27 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { User, userService } from '../services/users';
-import UserModal from '../components/modals/User';
+import { ApiError } from '../services/api';
 import Layout from '../components/layout/Layout';
+import ConfirmModal from '../components/modals/Confirm';
+import UserModal from '../components/modals/User';
 
 const Users: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [userModalMode, setUserModalMode] = useState<'create' | 'edit'>('create');
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const fetchUsers = async () => {
+    const fetchUsers = async (): Promise<void> => {
         setIsLoading(true);
         setError(null);
         try {
-            const data = await userService.getUsers();
-            setUsers(Array.isArray(data) ? data : []);
+            const fetchedUsers = await userService.getUsers();
+            setUsers(fetchedUsers);
         } catch (err) {
             console.error('Error fetching users:', err);
-            setError('Impossible de charger les utilisateurs');
-            setUsers([]);
+            if (err instanceof ApiError) {
+                setError(`Erreur ${err.status}: ${err.message}`);
+            } else {
+                setError('Erreur lors du chargement des utilisateurs');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -31,46 +38,56 @@ const Users: React.FC = () => {
         fetchUsers();
     }, []);
 
-    const handleOpenCreateModal = () => {
-        setModalMode('create');
+    const handleOpenCreateModal = (): void => {
+        setUserModalMode('create');
         setSelectedUser(null);
-        setIsModalOpen(true);
+        setIsUserModalOpen(true);
     };
 
-    const handleOpenEditModal = (user: User) => {
-        setModalMode('edit');
+    const handleOpenEditModal = (user: User): void => {
+        setUserModalMode('edit');
         setSelectedUser(user);
-        setIsModalOpen(true);
+        setIsUserModalOpen(true);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
+    const handleDeleteUser = (user: User): void => {
+        setUserToDelete(user);
+        setIsConfirmModalOpen(true);
     };
 
-    const handleDeleteUser = async (user: User) => {
-        if (!window.confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur ${user.name} ?`)) {
-            return;
-        }
+    const confirmDeleteUser = async (): Promise<void> => {
+        if (!userToDelete) return;
 
         setIsDeleting(true);
         try {
-            await userService.deleteUser(user.id);
-            fetchUsers();
+            await userService.deleteUser(userToDelete.id);
+            setUsers(users.filter(u => u.id !== userToDelete.id));
+            setIsConfirmModalOpen(false);
+            setUserToDelete(null);
         } catch (err) {
             console.error('Error deleting user:', err);
-            setError('Erreur lors de la suppression de l\'utilisateur');
+            if (err instanceof ApiError) {
+                setError(`Erreur ${err.status}: ${err.message}`);
+            } else {
+                setError('Erreur lors de la suppression de l\'utilisateur');
+            }
         } finally {
             setIsDeleting(false);
         }
     };
 
-    // Fonction pour obtenir les initiales de l'utilisateur
-    const getUserInitials = (user: User) => {
-        return user.name.substring(0, 2).toUpperCase();
+    const getUserInitials = (name: string): string => {
+        if (!name) return '?';
+        return name.split(' ')
+            .map(word => word[0])
+            .join('')
+            .toUpperCase()
+            .substring(0, 2);
     };
 
-    // Fonction pour générer une couleur basée sur le nom d'utilisateur
-    const getUserColor = (username: string) => {
+    const getUserColor = (username: string): string => {
+        if (!username) return 'bg-gray-500';
+
         const colors = [
             'bg-blue-500', 'bg-green-500', 'bg-yellow-500',
             'bg-red-500', 'bg-purple-500', 'bg-pink-500',
@@ -81,24 +98,21 @@ const Users: React.FC = () => {
         return colors[sum % colors.length];
     };
 
-    // Contenu de la sidebar (simple pour cette page)
-    const sidebarContent = (
-        <>
-            <button
-                onClick={handleOpenCreateModal}
-                className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg flex items-center space-x-3"
-            >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                <span className="ml-2">Nouvel utilisateur</span>
-            </button>
-        </>
-    );
-
     return (
         <Layout
-            sidebarContent={sidebarContent}
+            sidebarContent={
+                <>
+                    <button
+                        onClick={handleOpenCreateModal}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg flex items-center space-x-3"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span className="ml-2">Nouvel utilisateur</span>
+                    </button>
+                </>
+            }
             sidebarTitle="Utilisateurs"
             showSidebar={true}
         >
@@ -146,7 +160,7 @@ const Users: React.FC = () => {
                                 <li key={user.id}>
                                     <div className="px-6 py-4 flex items-center">
                                         <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center text-white font-medium ${getUserColor(user.name)}`}>
-                                            {getUserInitials(user)}
+                                            {getUserInitials(user.name)}
                                         </div>
                                         <div className="ml-4 flex-1">
                                             <div className="flex items-center justify-between">
@@ -192,11 +206,26 @@ const Users: React.FC = () => {
                 </div>
 
                 <UserModal
-                    isOpen={isModalOpen}
-                    onClose={handleCloseModal}
+                    isOpen={isUserModalOpen}
+                    onClose={() => setIsUserModalOpen(false)}
                     onSuccess={fetchUsers}
-                    mode={modalMode}
+                    mode={userModalMode}
                     user={selectedUser}
+                />
+
+                <ConfirmModal
+                    isOpen={isConfirmModalOpen}
+                    onClose={() => {
+                        setIsConfirmModalOpen(false);
+                        setUserToDelete(null);
+                    }}
+                    onConfirm={confirmDeleteUser}
+                    title="Supprimer l'utilisateur"
+                    message={`Êtes-vous sûr de vouloir supprimer l'utilisateur "${userToDelete?.name}" ? Cette action est irréversible.`}
+                    confirmText="Supprimer"
+                    cancelText="Annuler"
+                    isLoading={isDeleting}
+                    type="danger"
                 />
             </div>
         </Layout>
