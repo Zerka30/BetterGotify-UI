@@ -4,94 +4,125 @@ import { createContext, useContext, ReactNode, useState, useEffect } from 'react
 import React from 'react';
 import { initReactI18next } from 'react-i18next';
 
-// Importez vos traductions directement
-import frTranslation from '../public/locales/fr/translation.json';
-import enTranslation from '../public/locales/en/translation.json';
+export const AVAILABLE_LANGUAGES = [
+    { code: 'fr', name: 'Français' },
+    { code: 'en', name: 'English' },
+    // { code: 'es', name: 'Español' },
+    // { code: 'de', name: 'Deutsch' },
+];
 
-// Définition des ressources de traduction
-const resources = {
-    fr: {
-        translation: frTranslation
-    },
-    en: {
-        translation: enTranslation
+const loadTranslations = async () => {
+    const resources: Record<string, { translation: any }> = {};
+
+    const modules = import.meta.glob('../public/locales/*/translation.json', { eager: true });
+
+    for (const path in modules) {
+        const langCode = path.split('/')[3];
+
+        if (AVAILABLE_LANGUAGES.some(lang => lang.code === langCode)) {
+            resources[langCode] = {
+                translation: (modules[path] as any).default
+            };
+        }
+    }
+
+    return resources;
+};
+
+const initI18n = async () => {
+    try {
+        const resources = await loadTranslations();
+
+        i18next
+            .use(LanguageDetector)
+            .use(initReactI18next)
+            .init({
+                resources,
+                fallbackLng: 'fr',
+                interpolation: {
+                    escapeValue: false,
+                },
+                detection: {
+                    order: ['localStorage', 'navigator'],
+                    caches: ['localStorage']
+                }
+            });
+
+        console.log('i18n initialized with languages:', Object.keys(resources));
+    } catch (error) {
+        console.error('Failed to initialize i18n:', error);
     }
 };
 
-// Initialisation de i18next
-i18next
-    .use(LanguageDetector)
-    .use(initReactI18next)
-    .init({
-        resources,
-        fallbackLng: 'fr',
-        interpolation: {
-            escapeValue: false, // échapper les valeurs pour éviter les injections XSS
-        },
-        detection: {
-            order: ['localStorage', 'navigator'],
-            caches: ['localStorage']
-        }
-    });
+initI18n();
 
-// Types pour le contexte
 interface I18nContextType {
     t: (key: string, options?: any) => string;
     changeLanguage: (lng: string) => void;
     language: string;
+    availableLanguages: typeof AVAILABLE_LANGUAGES;
 }
 
-// Création du contexte React
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-// Props pour le provider
 interface I18nProviderProps {
     children: ReactNode;
 }
 
-// Provider React pour i18next
 export function I18nProvider({ children }: I18nProviderProps) {
     const [language, setLanguage] = useState(i18next.language);
+    const [isInitialized, setIsInitialized] = useState(i18next.isInitialized);
 
-    // Fonction pour changer de langue
     const changeLanguage = (lng: string) => {
         i18next.changeLanguage(lng).then(() => {
             setLanguage(lng);
         });
     };
 
-    // Écouter les changements de langue
     useEffect(() => {
         const handleLanguageChanged = () => {
             setLanguage(i18next.language);
         };
 
+        const handleInitialized = () => {
+            setIsInitialized(true);
+        };
+
         i18next.on('languageChanged', handleLanguageChanged);
+        i18next.on('initialized', handleInitialized);
 
         return () => {
             i18next.off('languageChanged', handleLanguageChanged);
+            i18next.off('initialized', handleInitialized);
         };
     }, []);
 
-    // Fonction de traduction sécurisée
     const t = (key: string, options?: any): string => {
-        // Vérification supplémentaire des options pour éviter les injections
+        if (!isInitialized) {
+            return key;
+        }
         const safeOptions = options ? { ...options } : undefined;
         return i18next.t(key, safeOptions);
     };
 
     return React.createElement(
         I18nContext.Provider,
-        { value: { t, changeLanguage, language } },
+        {
+            value: {
+                t,
+                changeLanguage,
+                language,
+                availableLanguages: AVAILABLE_LANGUAGES
+            }
+        },
         children
     );
 }
 
-// Hook personnalisé pour utiliser les traductions
 export function useTranslation() {
     const context = useContext(I18nContext);
     if (!context) {
-        throw new Error('useTranslation doit être utilisé à l\'intérieur d\'un I18nProvider');
+        throw new Error('useTranslation must be used within an I18nProvider');
     }
     return context;
 }
