@@ -110,7 +110,15 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                                 <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                                     <button
                                         type="button"
-                                        className={typeStyles.confirmButton}
+                                        className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:col-start-1"
+                                        onClick={onClose}
+                                        disabled={isLoading}
+                                    >
+                                        {cancelText}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`${typeStyles.confirmButton} sm:col-start-2`}
                                         onClick={onConfirm}
                                         disabled={isLoading}
                                     >
@@ -125,14 +133,6 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                                         ) : (
                                             confirmText
                                         )}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto"
-                                        onClick={onClose}
-                                        disabled={isLoading}
-                                    >
-                                        {cancelText}
                                     </button>
                                 </div>
                             </Dialog.Panel>
