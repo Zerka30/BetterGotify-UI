@@ -493,8 +493,8 @@ const Applications = () => {
                 onConfirm={confirmDeleteApp}
                 title={t('applications.modals.deleteApplication.title')}
                 message={t('applications.modals.deleteApplication.message', { name: appToDelete?.name })}
-                confirmText={t('applications.delete')}
-                cancelText={t('applications.cancel')}
+                confirmText={t('actions.delete')}
+                cancelText={t('actions.cancel')}
                 isLoading={isDeleting}
                 type="danger"
             />

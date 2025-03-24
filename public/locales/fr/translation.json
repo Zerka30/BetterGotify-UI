@@ -1,42 +1,41 @@
 {
+    "common": {
+        "yes": "Oui",
+        "no": "Non",
+        "error": "Erreur"
+    },
     "actions": {
         "save": "Enregistrer",
         "cancel": "Annuler",
         "delete": "Supprimer",
-        "deleteAll": "Supprimer tout",
+        "deleteAll": "Tout supprimer",
         "edit": "Modifier",
         "create": "Créer",
         "update": "Mettre à jour",
         "confirm": "Confirmer",
         "refresh": "Rafraîchir",
+        "saving": "Enregistrement...",
+        "deleting": "Suppression...",
+        "in_progress": "En cours...",
         "copyCommand": "Copier la commande"
     },
     "navigation": {
         "messages": "Messages",
-        "users": "Utilisateurs",
+        "users": "Users",
         "applications": "Applications",
         "clients": "Clients",
         "plugins": "Plugins"
     },
     "footer": {
         "copyright": "© {{year}} BetterGotify UI. Tous droits réservés.",
-        "version": "Version du serveur: v{{version}}",
-        "website": "Site officiel"
+        "version": "Version du serveur: v{{version}}"
     },
     "auth": {
-        "connectTo": "Connexion à Gotify",
+        "connectTo": "Se connecter à Gotify",
         "username": "Nom d'utilisateur",
         "password": "Mot de passe",
-        "login": "Se connecter",
-        "logout": "Se déconnecter"
-    },
-    "modals": {
-        "user": {
-            "deleteUserTitle": "Delete user",
-            "deleteUserMessage": "Are you sure you want to delete the user \"{{name}}\" ? This action is irreversible.",
-            "createUserTitle": "Create user",
-            "updateUserTitle": "Update user"
-        }
+        "login": "Connexion",
+        "logout": "Déconnexion"
     },
     "users": {
         "title": "Gestion des utilisateurs",
@@ -89,7 +88,9 @@
             "deleteApplication": "Supprimer l'application",
             "copyToken": "Copier le token",
             "showToken": "Afficher le token",
-            "hideToken": "Masquer le token"
+            "hideToken": "Masquer le token",
+            "deleteAllMessages": "Supprimer tous les messages",
+            "deleteMessage": "Supprimer ce message"
         },
         "details": {
             "description": "Description",
@@ -109,20 +110,38 @@
         },
         "messages": {
             "name": "Messages",
-            "recentMessages": "Recent messages",
-            "allMessages": "All messages",
+            "recentMessages": "Messages récents",
+            "allMessages": "Tous les messages",
             "noMessages": "Aucun message trouvé"
         },
         "errors": {
-            "loadingFailed": "Erreur lors du chargement des messages",
-            "savingFailed": "Erreur lors de la sauvegarde de l'application",
-            "deletingFailed": "Erreur lors de la suppression de l'application",
+            "loadingApplicationsFailed": "Erreur lors du chargement des applications",
+            "savingApplicationFailed": "Erreur lors de la sauvegarde de l'application",
+            "deletingApplicationFailed": "Erreur lors de la suppression de l'application",
+            "loadingMessagesFailed": "Erreur lors du chargement des messages",
+            "deletingMessageFailed": "Erreur lors de la suppression du message",
+            "deletingAllMessagesFailed": "Erreur lors de la suppression de tous les messages",
             "copyingTokenFailed": "Erreur lors de la copie du token"
         },
         "modals": {
             "deleteApplication": {
-                "title": "Delete application",
-                "message": "Are you sure you want to delete the application \"{{name}}\" ? This action is irreversible."
+                "title": "Supprimer l'application",
+                "message": "Êtes-vous sûr de vouloir supprimer l'application \"{{name}}\" ? Cette action est irréversible."
+            },
+            "createApp": {
+                "title": "Créer une application"
+            },
+            "updateApp": {
+                "title": "Mettre à jour l'application"
+            },
+            "form": {
+                "name": "Nom",
+                "description": "Description",
+                "priority": "Priorité",
+                "image": "Image",
+                "imageAdd": "Ajouter une image",
+                "imageUpdate": "Mettre à jour l'image",
+                "allowSize": "PNG, JPG, GIF jusqu'à 2MB"
             }
         }
     }
