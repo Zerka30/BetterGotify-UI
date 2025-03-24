@@ -25,11 +25,10 @@ const Users: React.FC = () => {
             const fetchedUsers = await userService.getUsers();
             setUsers(fetchedUsers);
         } catch (err) {
-            console.error('Error fetching users:', err);
             if (err instanceof ApiError) {
-                setError(`Erreur ${err.status}: ${err.message}`);
+                setError(t('common.error') + ' ' + err.status + ': ' + err.message);
             } else {
-                setError('Erreur lors du chargement des utilisateurs');
+                setError(t('users.errors.loadingFailed'));
             }
         } finally {
             setIsLoading(false);
@@ -67,11 +66,10 @@ const Users: React.FC = () => {
             setIsConfirmModalOpen(false);
             setUserToDelete(null);
         } catch (err) {
-            console.error('Error deleting user:', err);
             if (err instanceof ApiError) {
-                setError(`Erreur ${err.status}: ${err.message}`);
+                setError(t('common.error') + ' ' + err.status + ': ' + err.message);
             } else {
-                setError('Erreur lors de la suppression de l\'utilisateur');
+                setError(t('users.errors.deletingFailed'));
             }
         } finally {
             setIsDeleting(false);
@@ -111,11 +109,11 @@ const Users: React.FC = () => {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        <span className="ml-2">{t('users.newUser')}</span>
+                        <span className="ml-2">{t('users.actions.newUser')}</span>
                     </button>
                 </>
             }
-            sidebarTitle="Utilisateurs"
+            sidebarTitle={t('users.sidebarTitle')}
             showSidebar={true}
         >
             <div className="p-6">
@@ -128,7 +126,7 @@ const Users: React.FC = () => {
                         <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                         </svg>
-                        {t('users.newUser')}
+                        {t('users.actions.newUser')}
                     </button>
                 </div>
 
@@ -176,7 +174,7 @@ const Users: React.FC = () => {
                                                         ? 'bg-purple-100 text-purple-800'
                                                         : 'bg-green-100 text-green-800'
                                                         }`}>
-                                                        {user.admin ? t('users.user.role.admin') : t('users.user.role.user')}
+                                                        {user.admin ? t('users.details.role.admin') : t('users.details.role.user')}
                                                     </span>
                                                     <button
                                                         onClick={() => handleOpenEditModal(user)}
@@ -222,8 +220,8 @@ const Users: React.FC = () => {
                         setUserToDelete(null);
                     }}
                     onConfirm={confirmDeleteUser}
-                    title={t('modals.user.deleteUserTitle')}
-                    message={t('modals.user.deleteUserMessage', { name: userToDelete?.name })}
+                    title={t('users.modals.deleteUser.title')}
+                    message={t('users.modals.deleteUser.message', { name: userToDelete?.name })}
                     confirmText={t('actions.delete')}
                     cancelText={t('actions.cancel')}
                     isLoading={isDeleting}

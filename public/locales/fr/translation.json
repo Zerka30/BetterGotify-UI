@@ -40,9 +40,14 @@
     },
     "users": {
         "title": "Gestion des utilisateurs",
-        "newUser": "Nouvel utilisateur",
+        "sidebarTitle": "Utilisateurs",
         "noUsers": "Aucun utilisateur trouvé",
-        "user": {
+        "actions": {
+            "newUser": "Nouvel utilisateur",
+            "editUser": "Modifier l'utilisateur",
+            "deleteUser": "Supprimer l'utilisateur"
+        },
+        "details": {
             "name": "Nom d'utilisateur",
             "password": "Mot de passe",
             "confirmPassword": "Confirmer le mot de passe",
@@ -52,6 +57,23 @@
             "role": {
                 "admin": "Administrateur",
                 "user": "Utilisateur"
+            }
+        },
+        "errors": {
+            "loadingFailed": "Erreur lors du chargement des utilisateurs",
+            "savingFailed": "Erreur lors de la sauvegarde de l'utilisateur",
+            "deletingFailed": "Erreur lors de la suppression de l'utilisateur"
+        },
+        "modals": {
+            "deleteUser": {
+                "title": "Supprimer l'utilisateur",
+                "message": "Êtes-vous sûr de vouloir supprimer l'utilisateur \"{{name}}\" ? Cette action est irréversible."
+            },
+            "createUser": {
+                "title": "Créer un utilisateur"
+            },
+            "updateUser": {
+                "title": "Mettre à jour l'utilisateur"
             }
         }
     },
@@ -102,16 +124,6 @@
                 "title": "Delete application",
                 "message": "Are you sure you want to delete the application \"{{name}}\" ? This action is irreversible."
             }
-        }
-    },
-    "errors": {
-        "user": {
-            "name": "Le nom d'utilisateur est requis",
-            "password": "Le mot de passe est requis",
-            "confirmPassword": "Le mot de passe de confirmation est requis",
-            "passwordMismatch": "Les mots de passe ne correspondent pas",
-            "errorCreating": "Une erreur est survenue lors de la création de l'utilisateur",
-            "errorUpdating": "Une erreur est survenue lors de la mise à jour de l'utilisateur"
         }
     }
 }

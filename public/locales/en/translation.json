@@ -37,20 +37,16 @@
         "login": "Login",
         "logout": "Logout"
     },
-    "modals": {
-        "user": {
-            "deleteUserTitle": "Delete user",
-            "deleteUserMessage": "Are you sure you want to delete the user \"{{name}}\" ? This action is irreversible.",
-            "createUserTitle": "Create user",
-            "updateUserTitle": "Update user"
-        }
-    },
     "users": {
         "title": "Users management",
         "sidebarTitle": "Users",
-        "newUser": "New user",
         "noUsers": "No users found",
-        "user": {
+        "actions": {
+            "newUser": "New user",
+            "editUser": "Edit user",
+            "deleteUser": "Delete user"
+        },
+        "details": {
             "name": "Username",
             "password": "Password",
             "confirmPassword": "Confirm password",
@@ -61,69 +57,72 @@
                 "admin": "Administrator",
                 "user": "User"
             }
-        }
-    },
-    "applications": {
-        "title": "Applications",
-        "sidebarTitle": "Applications",
-        "noApplications": "No applications found",
-        "noApplicationsSelected": "No application selected",
-        "noApplicationsSelectedDescription": "Select an application in the list or create a new one.",
-        "actions": {
-            "newApplication": "New application",
-            "editApplication": "Edit application",
-            "deleteApplication": "Delete application",
-            "copyToken": "Copy token",
-            "showToken": "Show token",
-            "hideToken": "Hide token"
-        },
-        "details": {
-            "description": "Description",
-            "details": "Details",
-            "defaultPriority": "Default priority",
-            "lastUsed": "Last used",
-            "neverUsed": "Never used",
-            "internal": "Internal application",
-            "token": "Token",
-            "authToken": "Authentication token",
-            "tokenCopied": "Token copied to clipboard",
-            "tokenUnavailable": "Token is unavailable",
-            "tokenDescription": "This token is used to authenticate the application to the server.",
-            "yourToken": "Your token",
-            "exampleTitle": "Usage example",
-            "exampleSubtitle": "Send a message using cURL"
-        },
-        "messages": {
-            "name": "Messages",
-            "recentMessages": "Recent messages",
-            "allMessages": "All messages",
-            "noMessages": "No messages found"
         },
         "errors": {
-            "loadingFailed": "Error while loading messages",
-            "savingFailed": "Error while saving application",
-            "deletingFailed": "Error while deleting application",
-            "copyingTokenFailed": "Error while copying token"
+            "loadingFailed": "Error while loading users",
+            "savingFailed": "Error while saving user",
+            "deletingFailed": "Error while deleting user"
         },
         "modals": {
-            "deleteApplication": {
-                "title": "Delete application",
-                "message": "Are you sure you want to delete the application \"{{name}}\" ? This action is irreversible."
+            "deleteUser": {
+                "title": "Delete user",
+                "message": "Are you sure you want to delete the user \"{{name}}\" ? This action is irreversible."
+            },
+            "createUser": {
+                "title": "Create user"
+            },
+            "updateUser": {
+                "title": "Update user"
             }
-        }
-    },
-    "errors": {
-        "user": {
-            "name": "Username is required",
-            "password": "Password is required",
-            "confirmPassword": "Confirm password is required",
-            "passwordMismatch": "Passwords do not match",
-            "errorCreating": "An error occurred while creating the user",
-            "errorUpdating": "An error occurred while updating the user"
         },
-        "application": {
-            "errorSaving": "An error occurred while saving the application",
-            "errorDeleting": "An error occurred while deleting the application"
+        "applications": {
+            "title": "Applications",
+            "sidebarTitle": "Applications",
+            "noApplications": "No applications found",
+            "noApplicationsSelected": "No application selected",
+            "noApplicationsSelectedDescription": "Select an application in the list or create a new one.",
+            "actions": {
+                "newApplication": "New application",
+                "editApplication": "Edit application",
+                "deleteApplication": "Delete application",
+                "copyToken": "Copy token",
+                "showToken": "Show token",
+                "hideToken": "Hide token"
+            },
+            "details": {
+                "description": "Description",
+                "details": "Details",
+                "defaultPriority": "Default priority",
+                "lastUsed": "Last used",
+                "neverUsed": "Never used",
+                "internal": "Internal application",
+                "token": "Token",
+                "authToken": "Authentication token",
+                "tokenCopied": "Token copied to clipboard",
+                "tokenUnavailable": "Token is unavailable",
+                "tokenDescription": "This token is used to authenticate the application to the server.",
+                "yourToken": "Your token",
+                "exampleTitle": "Usage example",
+                "exampleSubtitle": "Send a message using cURL"
+            },
+            "messages": {
+                "name": "Messages",
+                "recentMessages": "Recent messages",
+                "allMessages": "All messages",
+                "noMessages": "No messages found"
+            },
+            "errors": {
+                "loadingFailed": "Error while loading messages",
+                "savingFailed": "Error while saving application",
+                "deletingFailed": "Error while deleting application",
+                "copyingTokenFailed": "Error while copying token"
+            },
+            "modals": {
+                "deleteApplication": {
+                    "title": "Delete application",
+                    "message": "Are you sure you want to delete the application \"{{name}}\" ? This action is irreversible."
+                }
+            }
         }
     }
 }

@@ -48,22 +48,22 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
     const validateForm = (): boolean => {
         // Basic validation
         if (!name.trim()) {
-            setError(t('errors.user.name'));
+            setError(t('users.errors.name'));
             return false;
         }
 
         if (mode === 'create') {
             if (!password.trim()) {
-                setError(t('errors.user.password'));
+                setError(t('users.errors.password'));
                 return false;
             } a
 
             if (password !== confirmPassword) {
-                setError(t('errors.user.passwordMismatch'));
+                setError(t('users.errors.passwordMismatch'));
                 return false;
             }
         } else if (password && password !== confirmPassword) {
-            setError(t('errors.user.passwordMismatch'));
+            setError(t('users.errors.passwordMismatch'));
             return false;
         }
 
@@ -152,7 +152,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                             {/* Username field */}
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                                    {t('users.user.name')}
+                                    {t('users.details.name')}
                                 </label>
                                 <input
                                     type="text"
@@ -170,7 +170,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                 <>
                                     <div>
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                            {t('users.user.password')}
+                                            {t('users.details.password')}
                                         </label>
                                         <input
                                             type="password"
@@ -185,7 +185,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
 
                                     <div>
                                         <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                            {t('users.user.confirmPassword')}
+                                            {t('users.details.confirmPassword')}
                                         </label>
                                         <input
                                             type="password"
@@ -202,7 +202,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                 <>
                                     <div>
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                            {t('users.user.newPassword')}
+                                            {t('users.details.newPassword')}
                                         </label>
                                         <input
                                             type="password"
@@ -211,14 +211,14 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                             onChange={(e) => setPassword(e.target.value)}
                                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                             disabled={isSubmitting}
-                                            placeholder={t('users.user.passwordPlaceholder')}
+                                            placeholder={t('users.details.passwordPlaceholder')}
                                         />
                                     </div>
 
                                     {password && (
                                         <div>
                                             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                                {t('users.user.confirmNewPassword')}
+                                                {t('users.details.confirmNewPassword')}
                                             </label>
                                             <input
                                                 type="password"
@@ -244,7 +244,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                     disabled={isSubmitting}
                                 />
                                 <label htmlFor="isAdmin" className="ml-2 block text-sm text-gray-900">
-                                    {t('users.user.role.admin')}
+                                    {t('users.details.role.admin')}
                                 </label>
                             </div>
                         </div>
@@ -266,7 +266,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                             disabled={isSubmitting}
                             className="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm disabled:opacity-50"
                         >
-                            {isSubmitting ? 'Enregistrement...' : mode === 'create' ? t('actions.create') : t('actions.update')}
+                            {isSubmitting ? t('actions.saving') : mode === 'create' ? t('actions.create') : t('actions.update')}
                         </button>
                     </div>
                 </div>
