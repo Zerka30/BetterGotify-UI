@@ -137,7 +137,7 @@ const Sidebar = ({
 
             {/* Sidebar avec animation améliorée */}
             <div className={`
-        ${isMobileView ? 'fixed inset-y-0 left-0 z-30 w-72 transition-all duration-300 transform shadow-lg' : 'w-64 flex-shrink-0'}
+        ${isMobileView ? 'fixed inset-y-0 left-0 z-30 w-72 transition-all duration-300 transform shadow-lg' : 'w-64 flex-shrink-0 h-screen'}
         ${isMobileView && !isOpen ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}
         bg-white border-r border-gray-200 overflow-hidden flex flex-col
       `}>
