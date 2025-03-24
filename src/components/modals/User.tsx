@@ -101,7 +101,6 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
             onSuccess();
             onClose();
         } catch (err) {
-            console.error('Error submitting user:', err);
             if (err instanceof Error) {
                 setError(err.message || t('errors.user.errorCreating'));
             } else {
@@ -129,7 +128,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                     <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                {mode === 'create' ? t('modals.user.createUserTitle') : t('modals.user.updateUserTitle')}
+                                {mode === 'create' ? t('users.modals.createUser.title') : t('users.modals.updateUser.title')}
                             </h3>
                             <button
                                 type="button"
@@ -152,7 +151,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                             {/* Username field */}
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                                    {t('users.details.name')}
+                                    {t('users.modals.form.username')}
                                 </label>
                                 <input
                                     type="text"
@@ -170,7 +169,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                 <>
                                     <div>
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                            {t('users.details.password')}
+                                            {t('users.modals.form.password')}
                                         </label>
                                         <input
                                             type="password"
@@ -185,7 +184,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
 
                                     <div>
                                         <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                            {t('users.details.confirmPassword')}
+                                            {t('users.modals.form.confirmPassword')}
                                         </label>
                                         <input
                                             type="password"
@@ -202,7 +201,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                 <>
                                     <div>
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                            {t('users.details.newPassword')}
+                                            {t('users.modals.form.newPassword')}
                                         </label>
                                         <input
                                             type="password"
@@ -218,7 +217,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                     {password && (
                                         <div>
                                             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                                {t('users.details.confirmNewPassword')}
+                                                {t('users.modals.form.confirmNewPassword')}
                                             </label>
                                             <input
                                                 type="password"

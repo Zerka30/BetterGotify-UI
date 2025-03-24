@@ -73,6 +73,13 @@
             },
             "updateUser": {
                 "title": "Mettre à jour l'utilisateur"
+            },
+            "form": {
+                "username": "Nom d'utilisateur",
+                "password": "Mot de passe",
+                "confirmPassword": "Confirmer le mot de passe",
+                "newPassword": "Nouveau mot de passe (optionnel)",
+                "confirmNewPassword": "Confirmer le nouveau mot de passe"
             }
         }
     },

@@ -73,6 +73,13 @@
             },
             "updateUser": {
                 "title": "Update user"
+            },
+            "form": {
+                "username": "Username",
+                "password": "Password",
+                "confirmPassword": "Confirm password",
+                "newPassword": "New password (optional)",
+                "confirmNewPassword": "Confirm new password"
             }
         }
     },
