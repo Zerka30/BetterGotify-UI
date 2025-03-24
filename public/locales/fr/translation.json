@@ -1,4 +1,15 @@
 {
+    "actions": {
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "deleteAll": "Supprimer tout",
+        "edit": "Modifier",
+        "create": "Créer",
+        "update": "Mettre à jour",
+        "confirm": "Confirmer",
+        "refresh": "Rafraîchir"
+    },
     "navigation": {
         "messages": "Messages",
         "users": "Utilisateurs",
@@ -15,6 +26,42 @@
         "connectTo": "Connexion à Gotify",
         "username": "Nom d'utilisateur",
         "password": "Mot de passe",
-        "login": "Se connecter"
+        "login": "Se connecter",
+        "logout": "Se déconnecter"
+    },
+    "modals": {
+        "user": {
+            "deleteUserTitle": "Delete user",
+            "deleteUserMessage": "Are you sure you want to delete the user \"{{name}}\" ? This action is irreversible.",
+            "createUserTitle": "Create user",
+            "updateUserTitle": "Update user"
+        }
+    },
+    "users": {
+        "title": "Gestion des utilisateurs",
+        "newUser": "Nouvel utilisateur",
+        "noUsers": "Aucun utilisateur trouvé",
+        "user": {
+            "name": "Nom d'utilisateur",
+            "password": "Mot de passe",
+            "confirmPassword": "Confirmer le mot de passe",
+            "newPassword": "Nouveau mot de passe (optionnel)",
+            "confirmNewPassword": "Confirmer le nouveau mot de passe",
+            "passwordPlaceholder": "Laisser vide pour ne pas modifier",
+            "role": {
+                "admin": "Administrateur",
+                "user": "Utilisateur"
+            }
+        }
+    },
+    "errors": {
+        "user": {
+            "name": "Le nom d'utilisateur est requis",
+            "password": "Le mot de passe est requis",
+            "confirmPassword": "Le mot de passe de confirmation est requis",
+            "passwordMismatch": "Les mots de passe ne correspondent pas",
+            "errorCreating": "Une erreur est survenue lors de la création de l'utilisateur",
+            "errorUpdating": "Une erreur est survenue lors de la mise à jour de l'utilisateur"
+        }
     }
 }

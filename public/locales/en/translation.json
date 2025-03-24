@@ -1,4 +1,15 @@
 {
+    "actions": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "deleteAll": "Delete All",
+        "edit": "Edit",
+        "create": "Create",
+        "update": "Update",
+        "confirm": "Confirm",
+        "refresh": "Refresh"
+    },
     "navigation": {
         "messages": "Messages",
         "users": "Users",
@@ -16,5 +27,40 @@
         "password": "Password",
         "login": "Login",
         "logout": "Logout"
+    },
+    "modals": {
+        "user": {
+            "deleteUserTitle": "Delete user",
+            "deleteUserMessage": "Are you sure you want to delete the user \"{{name}}\" ? This action is irreversible.",
+            "createUserTitle": "Create user",
+            "updateUserTitle": "Update user"
+        }
+    },
+    "users": {
+        "title": "Users management",
+        "newUser": "New user",
+        "noUsers": "No users found",
+        "user": {
+            "name": "Username",
+            "password": "Password",
+            "confirmPassword": "Confirm password",
+            "newPassword": "New password (optional)",
+            "confirmNewPassword": "Confirm new password",
+            "passwordPlaceholder": "Leave empty to not modify",
+            "role": {
+                "admin": "Administrator",
+                "user": "User"
+            }
+        }
+    },
+    "errors": {
+        "user": {
+            "name": "Username is required",
+            "password": "Password is required",
+            "confirmPassword": "Confirm password is required",
+            "passwordMismatch": "Passwords do not match",
+            "errorCreating": "An error occurred while creating the user",
+            "errorUpdating": "An error occurred while updating the user"
+        }
     }
 }

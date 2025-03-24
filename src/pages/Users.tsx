@@ -4,8 +4,10 @@ import { ApiError } from '../services/api';
 import Layout from '../components/layout/Layout';
 import ConfirmModal from '../components/modals/Confirm';
 import UserModal from '../components/modals/User';
+import { useTranslation } from 'react-i18next';
 
 const Users: React.FC = () => {
+    const { t } = useTranslation();
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
@@ -109,7 +111,7 @@ const Users: React.FC = () => {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        <span className="ml-2">Nouvel utilisateur</span>
+                        <span className="ml-2">{t('users.newUser')}</span>
                     </button>
                 </>
             }
@@ -118,7 +120,7 @@ const Users: React.FC = () => {
         >
             <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">Gestion des utilisateurs</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('users.title')}</h1>
                     <button
                         onClick={handleOpenCreateModal}
                         className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -126,7 +128,7 @@ const Users: React.FC = () => {
                         <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                         </svg>
-                        Nouvel utilisateur
+                        {t('users.newUser')}
                     </button>
                 </div>
 
@@ -152,7 +154,7 @@ const Users: React.FC = () => {
                         </div>
                     ) : users.length === 0 ? (
                         <div className="p-6 text-center text-gray-500">
-                            Aucun utilisateur trouvé
+                            {t('users.noUsers')}
                         </div>
                     ) : (
                         <ul className="divide-y divide-gray-200">
@@ -174,12 +176,12 @@ const Users: React.FC = () => {
                                                         ? 'bg-purple-100 text-purple-800'
                                                         : 'bg-green-100 text-green-800'
                                                         }`}>
-                                                        {user.admin ? 'Administrateur' : 'Utilisateur'}
+                                                        {user.admin ? t('users.user.role.admin') : t('users.user.role.user')}
                                                     </span>
                                                     <button
                                                         onClick={() => handleOpenEditModal(user)}
                                                         className="text-gray-400 hover:text-blue-500 focus:outline-none"
-                                                        title="Modifier"
+                                                        title={t('actions.edit')}
                                                     >
                                                         <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -188,7 +190,7 @@ const Users: React.FC = () => {
                                                     <button
                                                         onClick={() => handleDeleteUser(user)}
                                                         className="text-gray-400 hover:text-red-500 focus:outline-none"
-                                                        title="Supprimer"
+                                                        title={t('actions.delete')}
                                                         disabled={isDeleting}
                                                     >
                                                         <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -220,10 +222,10 @@ const Users: React.FC = () => {
                         setUserToDelete(null);
                     }}
                     onConfirm={confirmDeleteUser}
-                    title="Supprimer l'utilisateur"
-                    message={`Êtes-vous sûr de vouloir supprimer l'utilisateur "${userToDelete?.name}" ? Cette action est irréversible.`}
-                    confirmText="Supprimer"
-                    cancelText="Annuler"
+                    title={t('modals.user.deleteUserTitle')}
+                    message={t('modals.user.deleteUserMessage', { name: userToDelete?.name })}
+                    confirmText={t('actions.delete')}
+                    cancelText={t('actions.cancel')}
                     isLoading={isDeleting}
                     type="danger"
                 />

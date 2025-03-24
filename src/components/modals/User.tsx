@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, userService } from '../../services/users';
+import { useTranslation } from 'react-i18next';
 
 interface UserModalProps {
     isOpen: boolean;
@@ -19,6 +20,9 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
     // UI states
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Translation
+    const { t } = useTranslation();
 
     // Reset form when modal opens or mode changes
     useEffect(() => {
@@ -44,22 +48,22 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
     const validateForm = (): boolean => {
         // Basic validation
         if (!name.trim()) {
-            setError('Le nom d\'utilisateur est requis');
+            setError(t('errors.user.name'));
             return false;
         }
 
         if (mode === 'create') {
             if (!password.trim()) {
-                setError('Le mot de passe est requis');
+                setError(t('errors.user.password'));
                 return false;
-            }
+            } a
 
             if (password !== confirmPassword) {
-                setError('Les mots de passe ne correspondent pas');
+                setError(t('errors.user.passwordMismatch'));
                 return false;
             }
         } else if (password && password !== confirmPassword) {
-            setError('Les mots de passe ne correspondent pas');
+            setError(t('errors.user.passwordMismatch'));
             return false;
         }
 
@@ -99,9 +103,9 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
         } catch (err) {
             console.error('Error submitting user:', err);
             if (err instanceof Error) {
-                setError(err.message || 'Une erreur est survenue lors de l\'enregistrement de l\'utilisateur');
+                setError(err.message || t('errors.user.errorCreating'));
             } else {
-                setError('Une erreur est survenue lors de l\'enregistrement de l\'utilisateur');
+                setError(t('errors.user.errorCreating'));
             }
         } finally {
             setIsSubmitting(false);
@@ -125,7 +129,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                     <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                {mode === 'create' ? 'Nouvel utilisateur' : 'Modifier l\'utilisateur'}
+                                {mode === 'create' ? t('modals.user.createUserTitle') : t('modals.user.updateUserTitle')}
                             </h3>
                             <button
                                 type="button"
@@ -148,7 +152,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                             {/* Username field */}
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                                    Nom d'utilisateur *
+                                    {t('users.user.name')}
                                 </label>
                                 <input
                                     type="text"
@@ -166,7 +170,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                 <>
                                     <div>
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                            Mot de passe *
+                                            {t('users.user.password')}
                                         </label>
                                         <input
                                             type="password"
@@ -181,7 +185,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
 
                                     <div>
                                         <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                            Confirmer le mot de passe *
+                                            {t('users.user.confirmPassword')}
                                         </label>
                                         <input
                                             type="password"
@@ -198,7 +202,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                 <>
                                     <div>
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                            Nouveau mot de passe (optionnel)
+                                            {t('users.user.newPassword')}
                                         </label>
                                         <input
                                             type="password"
@@ -207,14 +211,14 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                             onChange={(e) => setPassword(e.target.value)}
                                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                             disabled={isSubmitting}
-                                            placeholder="Laisser vide pour ne pas modifier"
+                                            placeholder={t('users.user.passwordPlaceholder')}
                                         />
                                     </div>
 
                                     {password && (
                                         <div>
                                             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                                Confirmer le nouveau mot de passe
+                                                {t('users.user.confirmNewPassword')}
                                             </label>
                                             <input
                                                 type="password"
@@ -240,7 +244,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                                     disabled={isSubmitting}
                                 />
                                 <label htmlFor="isAdmin" className="ml-2 block text-sm text-gray-900">
-                                    Administrateur
+                                    {t('users.user.role.admin')}
                                 </label>
                             </div>
                         </div>
@@ -254,7 +258,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                             disabled={isSubmitting}
                             className="w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm"
                         >
-                            Annuler
+                            {t('actions.cancel')}
                         </button>
                         <button
                             type="button"
@@ -262,7 +266,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                             disabled={isSubmitting}
                             className="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm disabled:opacity-50"
                         >
-                            {isSubmitting ? 'Enregistrement...' : mode === 'create' ? 'Créer' : 'Mettre à jour'}
+                            {isSubmitting ? 'Enregistrement...' : mode === 'create' ? t('actions.create') : t('actions.update')}
                         </button>
                     </div>
                 </div>
