@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../../services/auth';
+import { versionService, VersionInfo } from '../../services/version';
 
 interface SidebarProps {
     children: React.ReactNode;
@@ -8,6 +9,8 @@ interface SidebarProps {
     isOpen?: boolean;
     onClose?: () => void;
     mobileOnly?: boolean;
+    versionInfo?: { version: string };
+    isLoadingVersion?: boolean;
 }
 
 const Sidebar = ({
@@ -15,16 +18,32 @@ const Sidebar = ({
     title = "Navigation",
     isOpen = false,
     onClose = () => { },
-    mobileOnly = false
+    mobileOnly = false,
 }: SidebarProps) => {
     const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
     const navigate = useNavigate();
     const location = useLocation();
+    const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
+    const [isLoadingVersion, setIsLoadingVersion] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
             setIsMobileView(window.innerWidth < 768);
         };
+
+        const fetchVersion = async () => {
+            setIsLoadingVersion(true);
+            try {
+                const info = await versionService.getVersion();
+                setVersionInfo(info);
+            } catch (error) {
+                console.error('Failed to fetch version:', error);
+            } finally {
+                setIsLoadingVersion(false);
+            }
+        };
+
+        fetchVersion();
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -116,6 +135,16 @@ const Sidebar = ({
                     <div className="flex items-center justify-between p-4 bg-blue-600 text-white">
                         <div className="flex items-center space-x-2">
                             <h2 className="text-xl font-bold">Gotify</h2>
+                            {versionInfo && (
+                                <span className="text-xs bg-blue-700 px-2 py-1 rounded-full">
+                                    v{versionInfo.version}
+                                </span>
+                            )}
+                            {isLoadingVersion && (
+                                <span className="text-xs bg-blue-700 px-2 py-1 rounded-full animate-pulse">
+                                    Chargement...
+                                </span>
+                            )}
                         </div>
                         <button
                             onClick={onClose}
