@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../../services/auth';
 import { versionService, VersionInfo } from '../../services/version';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '../../i18n';
 
 interface NavbarProps {
     onToggleSidebar?: () => void;
@@ -20,7 +20,8 @@ const Navbar = ({
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
     const [isLoadingVersion, setIsLoadingVersion] = useState(false);
-    const { t, i18n } = useTranslation();
+    const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+    const { t, changeLanguage: i18nChangeLanguage, language, availableLanguages } = useTranslation();
 
     useEffect(() => {
         const fetchVersion = async () => {
@@ -55,6 +56,11 @@ const Navbar = ({
         if (path === '/' && location.pathname === '/') return true;
         if (path !== '/' && location.pathname.startsWith(path)) return true;
         return false;
+    };
+
+    const changeLanguage = (lng: string) => {
+        i18nChangeLanguage(lng);
+        setIsLanguageMenuOpen(false);
     };
 
     return (
@@ -109,9 +115,43 @@ const Navbar = ({
                     </div>
 
                     <div className="flex items-center">
+                        {/* Sélecteur de langue avec menu déroulant */}
+                        <div className="relative ml-3">
+                            <button
+                                onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
+                                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-blue-100 hover:bg-blue-500 focus:outline-none"
+                            >
+                                <span>{availableLanguages.find(lang => lang.code === language)?.name || 'Langue'}</span>
+                                <svg className="ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                </svg>
+                            </button>
+
+                            {/* Menu déroulant des langues avec défilement si nécessaire */}
+                            {isLanguageMenuOpen && (
+                                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 max-h-60 overflow-y-auto">
+                                    <div className="py-1" role="menu" aria-orientation="vertical">
+                                        {availableLanguages.map((lang) => (
+                                            <button
+                                                key={lang.code}
+                                                onClick={() => changeLanguage(lang.code)}
+                                                className={`block w-full text-left px-4 py-2 text-sm ${language === lang.code
+                                                    ? 'bg-blue-100 text-blue-900'
+                                                    : 'text-gray-700 hover:bg-gray-100'
+                                                    }`}
+                                                role="menuitem"
+                                            >
+                                                {lang.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         <button
                             onClick={handleLogout}
-                            className="hidden md:block bg-blue-700 hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium"
+                            className="hidden md:block bg-blue-700 hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium ml-3"
                         >
                             {t('auth.logout')}
                         </button>
@@ -133,6 +173,27 @@ const Navbar = ({
                                 {item.name}
                             </Link>
                         ))}
+
+                        {/* Sélecteur de langue pour mobile */}
+                        <div className="mt-3 px-3 py-2">
+                            <div className="text-sm font-medium text-blue-100 mb-2">
+                                {t('common.language')}
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                                {availableLanguages.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        onClick={() => changeLanguage(lang.code)}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium ${language === lang.code
+                                            ? 'bg-blue-700 text-white'
+                                            : 'bg-blue-500 text-blue-100 hover:bg-blue-600'
+                                            }`}
+                                    >
+                                        {lang.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
 
                         {/* Afficher le contenu de la sidebar dans le menu mobile si disponible */}
                         {showSidebarToggle && sidebarContent && (
