@@ -49,13 +49,9 @@ export const apiService = {
         }
 
         try {
-            console.log(`Fetching ${API_CONFIG.BASE_URL}${endpoint}`, options);
             const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, options);
 
-            // Pour déboguer
-            console.log(`Response status: ${response.status}`);
             const responseText = await response.text();
-            console.log(`Response body: ${responseText.substring(0, 200)}${responseText.length > 200 ? '...' : ''}`);
 
             if (!response.ok) {
                 throw new ApiError(response.status, response.statusText, '', '');
@@ -69,14 +65,12 @@ export const apiService = {
             try {
                 return JSON.parse(responseText) as T;
             } catch (e) {
-                console.error('Error parsing JSON:', e);
                 throw new ApiError(500, 'Invalid JSON response', '', '');
             }
         } catch (error) {
             if (error instanceof ApiError) {
                 throw error;
             }
-            console.error('Network error:', error);
             throw new ApiError(0, `Network error: ${error instanceof Error ? error.message : String(error)}`, '', '');
         }
     },
@@ -85,15 +79,11 @@ export const apiService = {
         const url = `${API_CONFIG.BASE_URL}${endpoint}`;
 
         try {
-            console.log("Sending FormData request to:", url);
-            console.log("FormData contents:", Array.from(formData.entries()));
-
             const hasFile = Array.from(formData.entries()).some(entry =>
                 entry[0] === 'file' && entry[1] instanceof File
             );
 
             if (!hasFile) {
-                console.error("FormData does not contain a file with key 'file'");
                 throw new ApiError(400, "Bad Request", "INVALID_FORM_DATA", "Le fichier est manquant");
             }
 
@@ -108,9 +98,7 @@ export const apiService = {
             });
 
             if (!response.ok) {
-                console.error("Upload failed with status:", response.status);
                 const errorText = await response.text();
-                console.error("Error response:", errorText);
 
                 let errorData;
                 try {
@@ -129,7 +117,6 @@ export const apiService = {
 
             return await response.json();
         } catch (error) {
-            console.error("FormData request error:", error);
             if (error instanceof ApiError) {
                 throw error;
             }
