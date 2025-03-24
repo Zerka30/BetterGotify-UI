@@ -3,34 +3,13 @@ import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
-import favicon from 'vite-plugin-favicon'
-import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    svgr(),
-    favicon({
-      logo: resolve(__dirname, 'src/assets/gotify-logo-small.svg'),
-      inject: true,
-      favicons: {
-        appName: 'Gotify',
-        appDescription: 'Gotify Web Client',
-        developerName: 'Gotify',
-        developerURL: 'https://gotify.net/',
-        icons: {
-          favicons: true,
-          android: true,
-          appleIcon: true,
-          appleStartup: false,
-          coast: false,
-          windows: false,
-          yandex: false
-        }
-      }
-    })
+    svgr()
   ],
   resolve: {
     alias: {
