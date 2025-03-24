@@ -14,10 +14,10 @@
         "update": "Mettre à jour",
         "confirm": "Confirmer",
         "refresh": "Rafraîchir",
+        "copyCommand": "Copier la commande",
         "saving": "Enregistrement...",
         "deleting": "Suppression...",
-        "in_progress": "En cours...",
-        "copyCommand": "Copier la commande"
+        "in_progress": "En cours..."
     },
     "navigation": {
         "messages": "Messages",
