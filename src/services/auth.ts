@@ -9,15 +9,13 @@ interface LoginResponse {
 export const authService = {
     async login(username: string, password: string) {
         try {
-            // Créer le Basic Auth token correctement
             const basicAuth = btoa(`${username}:${password}`);
-            console.log('Basic Auth Token:', basicAuth); // Pour debug
 
             const response = await fetch(`${API_CONFIG.BASE_URL}/client`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Basic ${basicAuth}`, // Ajout du préfixe "Basic "
+                    'Authorization': `Basic ${basicAuth}`,
                     'Origin': 'https://gotify.zerka.dev',
                     'Referer': 'https://gotify.zerka.dev/'
                 },
@@ -81,4 +79,4 @@ export const authService = {
         const client = localStorage.getItem('gotify-client');
         return client ? JSON.parse(client) : null;
     }
-} 
+}

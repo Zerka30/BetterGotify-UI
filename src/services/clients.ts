@@ -1,5 +1,4 @@
 import { apiService } from './api';
-import { User } from './users';
 
 export interface Client {
     id: number;
@@ -27,4 +26,4 @@ export const clientService = {
     async deleteClient(id: number): Promise<void> {
         return apiService.request(`/client/${id}`, 'DELETE');
     }
-}; 
+};
