@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../../services/auth';
 import { versionService, VersionInfo } from '../../services/version';
 import { useTranslation } from 'react-i18next';
+import logo from '../../assets/gotify-logo-small.svg';
 
 interface SidebarProps {
     children: React.ReactNode;
@@ -145,6 +146,11 @@ const Sidebar = ({
                 {isMobileView && (
                     <div className="flex items-center justify-between p-4 bg-blue-600 text-white">
                         <div className="flex items-center space-x-2">
+                            <img
+                                src={logo}
+                                alt="Gotify Logo"
+                                className="h-8 w-8 mr-2"
+                            />
                             <h2 className="text-xl font-bold">Gotify</h2>
                             {versionInfo && (
                                 <span className="text-xs bg-blue-700 px-2 py-1 rounded-full">

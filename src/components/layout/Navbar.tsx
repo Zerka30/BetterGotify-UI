@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../../services/auth';
 import { versionService, VersionInfo } from '../../services/version';
 import { useTranslation } from '../../i18n';
+import logo from '../../assets/gotify-logo-small.svg';
 
 interface NavbarProps {
     onToggleSidebar?: () => void;
@@ -82,18 +83,25 @@ const Navbar = ({
                         )}
 
                         <div className="flex-shrink-0">
-                            <Link to="/" className="text-xl font-bold">Gotify</Link>
+                            <Link to="/" className="flex items-center">
+                                <img
+                                    src={logo}
+                                    alt="Gotify Logo"
+                                    className="h-8 w-8 mr-2"
+                                />
+                                <span className="text-xl font-bold">Gotify</span>
 
-                            {versionInfo && (
-                                <span className="ml-2 text-xs bg-blue-700 px-2 py-1 rounded-full">
-                                    v{versionInfo.version}
-                                </span>
-                            )}
-                            {isLoadingVersion && (
-                                <span className="ml-2 text-xs bg-blue-700 px-2 py-1 rounded-full animate-pulse">
-                                    Chargement...
-                                </span>
-                            )}
+                                {versionInfo && (
+                                    <span className="ml-2 text-xs bg-blue-700 px-2 py-1 rounded-full">
+                                        v{versionInfo.version}
+                                    </span>
+                                )}
+                                {isLoadingVersion && (
+                                    <span className="ml-2 text-xs bg-blue-700 px-2 py-1 rounded-full animate-pulse">
+                                        Chargement...
+                                    </span>
+                                )}
+                            </Link>
                         </div>
 
                         <div className="hidden md:block ml-10">
