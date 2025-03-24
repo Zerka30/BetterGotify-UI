@@ -7,20 +7,26 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 
 const Applications = () => {
+    // Application states
     const [applications, setApplications] = useState<Application[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [appToDelete, setAppToDelete] = useState<Application | null>(null);
+
+    // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
     const [modalApp, setModalApp] = useState<Application | null>(null);
-    const [isTokenVisible, setIsTokenVisible] = useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    const [appToDelete, setAppToDelete] = useState<Application | null>(null);
+
+    // UI states
+    const [isLoading, setIsLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isTokenVisible, setIsTokenVisible] = useState(false);
+
     const navigate = useNavigate();
 
-    // Fonction pour générer une couleur aléatoire basée sur le nom de l'application
+    // Generate a consistent color based on app name
     const getAppColor = (name: string) => {
         const colors = [
             'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500',
@@ -30,8 +36,7 @@ const Applications = () => {
         return colors[index];
     };
 
-    // Fonction pour obtenir les initiales d'une application
-    const getAppInitials = (name: string) => {
+    const getAppInitials = (name: string): string => {
         return name
             .split(' ')
             .map(word => word.charAt(0))
@@ -40,22 +45,23 @@ const Applications = () => {
             .substring(0, 2);
     };
 
-    const getImageUrl = (imagePath: string | undefined) => {
+    const getImageUrl = (imagePath: string | undefined): string | null => {
         if (!imagePath) return null;
         if (imagePath === 'static/defaultapp.png') return null;
         if (imagePath.startsWith('http')) return imagePath;
         return `https://gotify.zerka.dev/${imagePath}`;
     };
 
-    const hasValidImage = (app: Application) => {
-        return app.image && app.image !== 'static/defaultapp.png';
+    const hasValidImage = (app: Application): boolean => {
+        return Boolean(app.image && app.image !== 'static/defaultapp.png');
     };
 
+    // Load applications on component mount
     useEffect(() => {
         fetchApplications();
     }, []);
 
-    const fetchApplications = async () => {
+    const fetchApplications = async (): Promise<void> => {
         setIsLoading(true);
         setError(null);
         try {
@@ -74,74 +80,50 @@ const Applications = () => {
         }
     };
 
-    const handleOpenCreateModal = () => {
-        console.log("Opening create modal");
+    // Modal handlers
+    const handleOpenCreateModal = (): void => {
         setModalMode('create');
         setModalApp(null);
         setIsModalOpen(true);
     };
 
-    const handleOpenEditModal = (app: Application) => {
+    const handleOpenEditModal = (app: Application): void => {
         setModalMode('edit');
         setModalApp(app);
         setIsModalOpen(true);
     };
 
-    const handleCloseModal = () => {
+    const handleCloseModal = (): void => {
         setIsModalOpen(false);
     };
 
-    const handleSaveApp = async (appData: Application, image?: File, deleteImage?: boolean) => {
+    const handleSaveApp = async (appData: Application, image?: File, deleteImage?: boolean): Promise<void> => {
         try {
             setIsLoading(true);
             let updatedApp;
 
             if (appData.id === 0) {
-                // Création d'une nouvelle application
                 updatedApp = await applicationService.createApplication(appData.name, appData.description);
             } else {
-                // Mise à jour d'une application existante
                 updatedApp = await applicationService.updateApplication(appData.id, appData.name, appData.description);
             }
 
-            // Gestion de l'image
-            let shouldRefresh = false;
-
+            // Handle image upload or deletion
             if (image) {
-                console.log("Uploading image:", image);
-                // Upload d'une nouvelle image
                 updatedApp = await applicationService.uploadApplicationImage(updatedApp.id, image);
-                shouldRefresh = true;
             } else if (deleteImage === true) {
-                console.log("Deleting image for app:", updatedApp.id);
-                // Suppression de l'image existante
                 await applicationService.deleteApplicationImage(updatedApp.id);
-                // Mettre à jour l'application pour refléter la suppression de l'image
                 updatedApp = await applicationService.getApplication(updatedApp.id);
-                shouldRefresh = true;
             }
 
-            // Rafraîchir la liste des applications
-            try {
-                const apps = await applicationService.getApplications();
-                setApplications(Array.isArray(apps) ? apps : []);
-            } catch (error) {
-                console.error('Error refreshing applications:', error);
-            }
+            await fetchApplications();
 
-            // Si on était en train de modifier l'application sélectionnée, mettre à jour
+            // Update selected app if needed
             if (selectedApp && selectedApp.id === updatedApp.id) {
                 setSelectedApp(updatedApp);
             }
 
             setIsModalOpen(false);
-
-            // Forcer le rafraîchissement de la page si nécessaire
-            if (shouldRefresh) {
-                console.log("Image modified, forcing page refresh...");
-                // Utiliser directement window.location.reload() sans délai
-                window.location.reload();
-            }
         } catch (error) {
             console.error('Error saving application:', error);
         } finally {
@@ -149,30 +131,26 @@ const Applications = () => {
         }
     };
 
-    const handleDeleteApp = (app: Application) => {
+    const handleDeleteApp = (app: Application): void => {
         setAppToDelete(app);
         setIsConfirmModalOpen(true);
     };
 
-    const confirmDeleteApp = async () => {
+    const confirmDeleteApp = async (): Promise<void> => {
         if (!appToDelete) return;
 
         setIsDeleting(true);
         try {
             await applicationService.deleteApplication(appToDelete.id);
 
-            // Mettre à jour la liste des applications
             setApplications(applications.filter(app => app.id !== appToDelete.id));
 
-            // Si l'application supprimée était sélectionnée, sélectionner la première application restante
+            // Handle selected app after deletion
             if (selectedApp && selectedApp.id === appToDelete.id) {
-                if (applications.length > 1) {
-                    const nextApp = applications.find(app => app.id !== appToDelete.id);
-                    if (nextApp) {
-                        setSelectedApp(nextApp);
-                    }
+                const nextApp = applications.find(app => app.id !== appToDelete.id);
+                if (nextApp) {
+                    setSelectedApp(nextApp);
                 } else {
-                    // Rediriger vers la page d'accueil s'il n'y a plus d'applications
                     navigate('/');
                 }
             }
@@ -187,11 +165,12 @@ const Applications = () => {
         }
     };
 
-    const handleSelectApp = (app: Application) => {
+    const handleSelectApp = (app: Application): void => {
         setSelectedApp(app);
     };
 
-    const handleCopyToken = (token: string) => {
+    // Token management
+    const handleCopyToken = (token: string): void => {
         navigator.clipboard.writeText(token)
             .then(() => {
                 alert('Token copié dans le presse-papiers');
@@ -202,24 +181,33 @@ const Applications = () => {
             });
     };
 
-    const toggleTokenVisibility = () => {
+    const toggleTokenVisibility = (): void => {
         setIsTokenVisible(!isTokenVisible);
     };
 
-    // Contenu de la sidebar
+    // Render app icon or initials placeholder
+    const renderAppIcon = (app: Application) => {
+        if (hasValidImage(app)) {
+            return (
+                <img
+                    src={getImageUrl(app.image)}
+                    alt={`${app.name} logo`}
+                    className="flex-shrink-0 h-8 w-8 rounded-md object-contain bg-white border border-gray-200"
+                />
+            );
+        }
+
+        return (
+            <div className={`flex-shrink-0 h-8 w-8 rounded-md flex items-center justify-center text-white ${getAppColor(app.name)}`}>
+                {getAppInitials(app.name)}
+            </div>
+        );
+    };
+
+    // Sidebar content with app list
     const sidebarContent = (
         <>
-            <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider flex justify-between items-center">
-                <span>Applications</span>
-                {isLoading && (
-                    <svg className="animate-spin h-3 w-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                )}
-            </div>
-
-            {/* Liste des applications */}
+            {/* List of applications */}
             {error ? (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
                     {error}
@@ -251,17 +239,7 @@ const Applications = () => {
                                     : 'text-gray-700 hover:bg-gray-50'
                                     }`}
                             >
-                                {hasValidImage(app) ? (
-                                    <img
-                                        src={getImageUrl(app.image)}
-                                        alt={`${app.name} logo`}
-                                        className="flex-shrink-0 h-8 w-8 rounded-md object-contain bg-white border border-gray-200"
-                                    />
-                                ) : (
-                                    <div className={`flex-shrink-0 h-8 w-8 rounded-md flex items-center justify-center text-white ${getAppColor(app.name)}`}>
-                                        {getAppInitials(app.name)}
-                                    </div>
-                                )}
+                                {renderAppIcon(app)}
                                 <span className="ml-2 truncate">{app.name}</span>
                             </button>
                         </li>
@@ -269,7 +247,6 @@ const Applications = () => {
                 </ul>
             )}
 
-            {/* Bouton Nouvelle application en bas de la liste */}
             {applications.length > 0 && !isLoading && !error && (
                 <button
                     onClick={handleOpenCreateModal}
@@ -291,28 +268,28 @@ const Applications = () => {
             showSidebar={true}
         >
             <div className="p-6">
-                {/* Titre de la page - uniquement affiché quand aucune app n'est sélectionnée */}
+                {/* Page title - only displayed when no app is selected */}
                 {!selectedApp && (
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-2xl font-bold text-gray-900">Applications</h1>
                     </div>
                 )}
 
-                {/* Contenu */}
+                {/* Content */}
                 {selectedApp ? (
                     <div className="bg-white rounded-lg shadow overflow-hidden">
-                        {/* En-tête avec image/initiales et actions */}
+                        {/* Header with image/initials and actions */}
                         <div className="relative">
-                            {/* Arrière-plan avec un dégradé plus subtil et élégant, mais moins haut */}
+                            {/* Background with a more subtle and elegant gradient, but lower */}
                             <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
 
-                            {/* Overlay avec un motif subtil pour ajouter de la texture */}
+                            {/* Overlay with a subtle pattern to add texture */}
                             <div className="absolute inset-0 bg-opacity-10 bg-pattern"></div>
 
-                            {/* Contenu de l'en-tête avec un meilleur espacement */}
+                            {/* Header content with better spacing */}
                             <div className="absolute inset-0 flex items-center justify-between px-8">
                                 <div className="flex items-center">
-                                    {/* Image ou initiales avec une ombre plus douce et un effet de bordure, mais plus petites */}
+                                    {/* Image or initials with a softer shadow and border effect, but smaller */}
                                     {hasValidImage(selectedApp) ? (
                                         <div className="p-1 bg-white rounded-xl shadow-lg">
                                             <img
@@ -327,7 +304,7 @@ const Applications = () => {
                                         </div>
                                     )}
 
-                                    {/* Informations avec une typographie améliorée */}
+                                    {/* Informations with an improved typography */}
                                     <div className="ml-5">
                                         <h2 className="text-xl font-bold text-white tracking-tight">{selectedApp.name}</h2>
                                         <div className="flex items-center mt-1">
@@ -336,7 +313,7 @@ const Applications = () => {
                                     </div>
                                 </div>
 
-                                {/* Boutons d'action avec un design plus moderne */}
+                                {/* Action buttons with a more modern design */}
                                 <div className="flex space-x-3">
                                     <button
                                         onClick={() => handleOpenEditModal(selectedApp)}
@@ -365,7 +342,7 @@ const Applications = () => {
                             </div>
                         </div>
 
-                        {/* Informations principales */}
+                        {/* Main information */}
                         <div className="px-6 py-5">
                             {selectedApp.description && (
                                 <div className="mb-6">
@@ -498,7 +475,7 @@ const Applications = () => {
                 )}
             </div>
 
-            {/* Modal pour créer/éditer une application */}
+            {/* Modal to create/edit an application */}
             <AppModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
@@ -507,7 +484,7 @@ const Applications = () => {
                 app={modalApp}
             />
 
-            {/* Modal de confirmation de suppression */}
+            {/* Confirmation modal for application deletion */}
             <ConfirmModal
                 isOpen={isConfirmModalOpen}
                 onClose={() => {
