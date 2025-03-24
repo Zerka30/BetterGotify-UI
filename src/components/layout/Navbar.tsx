@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../../services/auth';
 import { versionService, VersionInfo } from '../../services/version';
+import { useTranslation } from 'react-i18next';
 
 interface NavbarProps {
     onToggleSidebar?: () => void;
@@ -19,6 +20,7 @@ const Navbar = ({
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
     const [isLoadingVersion, setIsLoadingVersion] = useState(false);
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
         const fetchVersion = async () => {
