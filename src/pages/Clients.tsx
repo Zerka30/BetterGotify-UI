@@ -3,38 +3,63 @@ import { Client, clientService } from '../services/clients';
 import { ApiError } from '../services/api';
 import ConfirmModal from '../components/modals/Confirm';
 import Layout from '../components/layout/Layout';
+import ClientModal from '../components/modals/Client';
 
 const Clients = () => {
+    // Client states
     const [clients, setClients] = useState<Client[]>([]);
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
 
-    // États pour le modal de création/édition
+    // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
     const [clientName, setClientName] = useState('');
-    const [isProcessing, setIsProcessing] = useState(false);
-
-    // États pour le modal de confirmation de suppression
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
 
-    // Charger les clients au chargement de la page
+    // UI states
+    const [isLoading, setIsLoading] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // Load clients on component mount
     useEffect(() => {
         fetchClients();
     }, []);
 
-    // Fonction pour récupérer les clients
-    const fetchClients = async () => {
+    // Generate a consistent color based on client name
+    const getClientColor = (clientName: string): string => {
+        if (!clientName) return 'bg-gray-500';
+
+        const colors = [
+            'bg-blue-500', 'bg-green-500', 'bg-yellow-500',
+            'bg-red-500', 'bg-purple-500', 'bg-pink-500',
+            'bg-indigo-500', 'bg-teal-500', 'bg-orange-500'
+        ];
+
+        const sum = clientName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        return colors[sum % colors.length];
+    };
+
+    // Get client initials for avatar
+    const getClientInitials = (clientName: string): string => {
+        if (!clientName) return '?';
+        return clientName.split(' ')
+            .map(word => word[0])
+            .join('')
+            .toUpperCase()
+            .substring(0, 2);
+    };
+
+    const fetchClients = async (): Promise<void> => {
         setIsLoading(true);
         setError(null);
         try {
             const fetchedClients = await clientService.getClients();
             setClients(fetchedClients);
 
-            // Sélectionner le premier client par défaut s'il n'y a pas de client sélectionné
+            // Select first client by default if none is selected
             if (fetchedClients.length > 0 && !selectedClient) {
                 setSelectedClient(fetchedClients[0]);
             }
@@ -50,44 +75,37 @@ const Clients = () => {
         }
     };
 
-    // Ouvrir le modal de création
-    const handleOpenCreateModal = () => {
+    // Modal handlers
+    const handleOpenCreateModal = (): void => {
         setModalMode('create');
         setClientName('');
         setIsModalOpen(true);
     };
 
-    // Ouvrir le modal d'édition
-    const handleOpenEditModal = (client: Client) => {
+    const handleOpenEditModal = (client: Client): void => {
         setModalMode('edit');
         setClientName(client.name);
         setSelectedClient(client);
         setIsModalOpen(true);
     };
 
-    // Fermer le modal
-    const handleCloseModal = () => {
+    const handleCloseModal = (): void => {
         setIsModalOpen(false);
         setClientName('');
     };
 
-    // Créer ou mettre à jour un client
-    const handleSaveClient = async () => {
-        if (!clientName.trim()) {
-            return;
-        }
+    const handleSaveClient = async (): Promise<void> => {
+        if (!clientName.trim()) return;
 
         setIsProcessing(true);
         try {
             let updatedClient;
 
             if (modalMode === 'create') {
-                // Créer un nouveau client
                 updatedClient = await clientService.createClient(clientName);
                 setClients([...clients, updatedClient]);
                 setSelectedClient(updatedClient);
             } else if (selectedClient) {
-                // Mettre à jour un client existant
                 updatedClient = await clientService.updateClient(selectedClient.id, clientName);
                 setClients(clients.map(client =>
                     client.id === updatedClient.id ? updatedClient : client
@@ -108,25 +126,24 @@ const Clients = () => {
         }
     };
 
-    // Ouvrir le modal de confirmation de suppression
-    const handleDeleteClient = (client: Client) => {
+    // Delete handlers
+    const handleDeleteClient = (client: Client): void => {
         setClientToDelete(client);
         setIsConfirmModalOpen(true);
     };
 
-    // Confirmer la suppression d'un client
-    const confirmDeleteClient = async () => {
+    const confirmDeleteClient = async (): Promise<void> => {
         if (!clientToDelete) return;
 
         setIsDeleting(true);
         try {
             await clientService.deleteClient(clientToDelete.id);
 
-            // Mettre à jour la liste des clients
+            // Update client list
             const updatedClients = clients.filter(client => client.id !== clientToDelete.id);
             setClients(updatedClients);
 
-            // Si le client supprimé était sélectionné, sélectionner le premier client restant
+            // Handle selected client after deletion
             if (selectedClient && selectedClient.id === clientToDelete.id) {
                 if (updatedClients.length > 0) {
                     setSelectedClient(updatedClients[0]);
@@ -149,11 +166,11 @@ const Clients = () => {
         }
     };
 
-    // Copier le token dans le presse-papiers
-    const handleCopyToken = (token: string) => {
+    // Copy token to clipboard
+    const handleCopyToken = (token: string): void => {
         navigator.clipboard.writeText(token)
             .then(() => {
-                // Feedback visuel temporaire
+                // Visual feedback
                 const tokenElement = document.getElementById(`token-${token}`);
                 if (tokenElement) {
                     tokenElement.classList.add('bg-green-100');
@@ -167,34 +184,9 @@ const Clients = () => {
             });
     };
 
-    // Fonction pour générer une couleur basée sur le nom du client
-    const getClientColor = (clientName: string) => {
-        if (!clientName) return 'bg-gray-500';
-
-        const colors = [
-            'bg-blue-500', 'bg-green-500', 'bg-yellow-500',
-            'bg-red-500', 'bg-purple-500', 'bg-pink-500',
-            'bg-indigo-500', 'bg-teal-500', 'bg-orange-500'
-        ];
-
-        const sum = clientName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        return colors[sum % colors.length];
-    };
-
-    // Fonction pour obtenir les initiales du client
-    const getClientInitials = (clientName: string) => {
-        if (!clientName) return '?';
-        return clientName.split(' ')
-            .map(word => word[0])
-            .join('')
-            .toUpperCase()
-            .substring(0, 2);
-    };
-
-    // Contenu de la sidebar
+    // Sidebar content with client list
     const sidebarContent = (
         <>
-            {/* Liste des clients */}
             {error ? (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
                     {error}
@@ -232,7 +224,7 @@ const Clients = () => {
                 </ul>
             )}
 
-            {/* Bouton Nouveau client en bas de la liste */}
+            {/* New client button at the bottom of the list */}
             {clients.length > 0 && !isLoading && !error && (
                 <button
                     onClick={handleOpenCreateModal}
@@ -254,33 +246,30 @@ const Clients = () => {
             showSidebar={true}
         >
             <div className="p-6">
-                {/* Titre de la page - uniquement affiché quand aucun client n'est sélectionné */}
+                {/* Page title - only shown when no client is selected */}
                 {!selectedClient && (
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
                     </div>
                 )}
 
-                {/* Contenu */}
+                {/* Content */}
                 {selectedClient ? (
                     <div className="bg-white rounded-lg shadow overflow-hidden">
-                        {/* En-tête avec image/initiales et actions */}
+                        {/* Header with gradient background */}
                         <div className="relative">
-                            {/* Arrière-plan avec un dégradé */}
                             <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
-
-                            {/* Overlay avec un motif subtil pour ajouter de la texture */}
                             <div className="absolute inset-0 bg-opacity-10 bg-pattern"></div>
 
-                            {/* Contenu de l'en-tête */}
+                            {/* Header content */}
                             <div className="absolute inset-0 flex items-center justify-between px-8">
                                 <div className="flex items-center">
-                                    {/* Avatar du client */}
+                                    {/* Client avatar */}
                                     <div className={`h-16 w-16 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg border-2 border-white border-opacity-20 ${getClientColor(selectedClient.name)}`}>
                                         {getClientInitials(selectedClient.name)}
                                     </div>
 
-                                    {/* Informations avec une typographie améliorée */}
+                                    {/* Client info */}
                                     <div className="ml-5">
                                         <h2 className="text-xl font-bold text-white tracking-tight">{selectedClient.name}</h2>
                                         <div className="flex items-center mt-1">
@@ -289,7 +278,7 @@ const Clients = () => {
                                     </div>
                                 </div>
 
-                                {/* Boutons d'action */}
+                                {/* Action buttons */}
                                 <div className="flex space-x-3">
                                     <button
                                         onClick={() => handleOpenEditModal(selectedClient)}
@@ -318,7 +307,7 @@ const Clients = () => {
                             </div>
                         </div>
 
-                        {/* Informations principales */}
+                        {/* Main information */}
                         <div className="px-6 py-5">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
@@ -396,73 +385,18 @@ const Clients = () => {
                 )}
             </div>
 
-            {/* Modal de création/édition de client */}
-            {isModalOpen && (
-                <div className="fixed z-10 inset-0 overflow-y-auto">
-                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-                        </div>
+            {/* Create/Edit client modal */}
+            <ClientModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onSave={handleSaveClient}
+                clientName={clientName}
+                setClientName={setClientName}
+                modalMode={modalMode}
+                isProcessing={isProcessing}
+            />
 
-                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div className="sm:flex sm:items-start">
-                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                        <h3 className="text-lg leading-6 font-medium text-gray-900">
-                                            {modalMode === 'create' ? 'Créer un nouveau client' : 'Modifier le client'}
-                                        </h3>
-                                        <div className="mt-4">
-                                            <label htmlFor="client-name" className="block text-sm font-medium text-gray-700">
-                                                Nom du client
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="client-name"
-                                                value={clientName}
-                                                onChange={(e) => setClientName(e.target.value)}
-                                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                                placeholder="Entrez le nom du client"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button
-                                    type="button"
-                                    onClick={handleSaveClient}
-                                    disabled={isProcessing || !clientName.trim()}
-                                    className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm ${isProcessing || !clientName.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                >
-                                    {isProcessing ? (
-                                        <>
-                                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Traitement...
-                                        </>
-                                    ) : (
-                                        modalMode === 'create' ? 'Créer' : 'Enregistrer'
-                                    )}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleCloseModal}
-                                    disabled={isProcessing}
-                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                >
-                                    Annuler
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Modal de confirmation de suppression */}
+            {/* Delete confirmation modal */}
             <ConfirmModal
                 isOpen={isConfirmModalOpen}
                 onClose={() => {
