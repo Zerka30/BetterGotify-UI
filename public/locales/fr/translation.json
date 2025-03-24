@@ -151,5 +151,56 @@
                 "allowSize": "PNG, JPG, GIF jusqu'à 2MB"
             }
         }
+    },
+    "clients": {
+        "title": "Clients",
+        "sidebarTitle": "Clients",
+        "noClients": "Aucun client trouvé",
+        "noClientsSelected": "Aucun client sélectionné",
+        "noClientsSelectedDescription": "Sélectionnez un client dans la liste ou créez un nouveau.",
+        "actions": {
+            "newClient": "Nouveau client",
+            "editClient": "Modifier le client",
+            "deleteClient": "Supprimer le client",
+            "copyToken": "Copier le token"
+        },
+        "details": {
+            "name": "Nom",
+            "description": "Description",
+            "identifier": "Identifiant",
+            "lastUsed": "Dernière utilisation",
+            "neverUsed": "Jamais utilisé",
+            "status": "Statut",
+            "active": "Actif",
+            "inactive": "Inactif",
+            "token": "Token",
+            "authToken": "Token d'authentification",
+            "tokenCopied": "Token copié dans le presse-papiers",
+            "tokenUnavailable": "Token non disponible",
+            "tokenDescription": "Ce token est utilisé pour authentifier le client au serveur."
+        },
+        "errors": {
+            "loadingClientsFailed": "Erreur lors du chargement des clients",
+            "savingClientFailed": "Erreur lors de la sauvegarde du client",
+            "deletingClientFailed": "Erreur lors de la suppression du client",
+            "copyingTokenFailed": "Erreur lors de la copie du token"
+        },
+        "modals": {
+            "deleteClient": {
+                "title": "Supprimer le client",
+                "message": "Êtes-vous sûr de vouloir supprimer le client \"{{name}}\" ? Cette action est irréversible."
+            },
+            "createClient": {
+                "title": "Créer un client"
+            },
+            "updateClient": {
+                "title": "Mettre à jour le client"
+            },
+            "form": {
+                "name": "Nom",
+                "namePlaceholder": "Entrez le nom du client",
+                "description": "Description"
+            }
+        }
     }
 }

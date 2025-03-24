@@ -4,6 +4,7 @@ import { ApiError } from '../services/api';
 import ConfirmModal from '../components/modals/Confirm';
 import Layout from '../components/layout/Layout';
 import ClientModal from '../components/modals/Client';
+import { useTranslation } from '../i18n';
 
 const Clients = () => {
     // States
@@ -22,6 +23,8 @@ const Clients = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const { t } = useTranslation();
 
     // Load clients on component mount
     useEffect(() => {
@@ -70,8 +73,8 @@ const Clients = () => {
             }
         } catch (err) {
             const errorMessage = err instanceof ApiError
-                ? `Erreur ${err.status}: ${err.message}`
-                : 'Erreur lors du chargement des clients';
+                ? t('common.errors', { status: err.status, message: err.message })
+                : t('clients.errors.loadingClientsFailed');
             setError(errorMessage);
         } finally {
             setIsLoading(false);
@@ -131,8 +134,8 @@ const Clients = () => {
             handleCloseModal();
         } catch (err) {
             const errorMessage = err instanceof ApiError
-                ? `Erreur ${err.status}: ${err.message}`
-                : 'Erreur lors de l\'enregistrement du client';
+                ? t('common.errors', { status: err.status, message: err.message })
+                : t('clients.errors.savingClientFailed');
             setError(errorMessage);
         } finally {
             setIsProcessing(false);
@@ -175,8 +178,8 @@ const Clients = () => {
             setClientToDelete(null);
         } catch (err) {
             const errorMessage = err instanceof ApiError
-                ? `Erreur ${err.status}: ${err.message}`
-                : 'Erreur lors de la suppression du client';
+                ? t('common.errors', { status: err.status, message: err.message })
+                : t('clients.errors.deletingClientFailed');
             setError(errorMessage);
         } finally {
             setIsDeleting(false);
@@ -198,7 +201,7 @@ const Clients = () => {
                 }
             })
             .catch(err => {
-                console.error('Erreur lors de la copie du token:', err);
+                console.error(t('clients.errors.copyingTokenFailed') + ': ' + err);
             });
     };
 
@@ -218,7 +221,7 @@ const Clients = () => {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        <span className="ml-2">Nouveau client</span>
+                        <span className="ml-2">{t('clients.actions.newClient')}</span>
                     </button>
                 </div>
             ) : (
@@ -251,7 +254,7 @@ const Clients = () => {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    <span className="ml-2">Nouveau client</span>
+                    <span className="ml-2">{t('clients.actions.newClient')}</span>
                 </button>
             )}
         </>
@@ -267,7 +270,7 @@ const Clients = () => {
                 {/* Page title - displayed only when no client is selected */}
                 {!selectedClient && (
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">{t('clients.title')}</h1>
                     </div>
                 )}
 
@@ -306,7 +309,7 @@ const Clients = () => {
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
-                                            Modifier
+                                            {t('actions.edit')}
                                         </span>
                                     </button>
                                     <button
@@ -318,7 +321,7 @@ const Clients = () => {
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                            Supprimer
+                                            {t('actions.delete')}
                                         </span>
                                     </button>
                                 </div>
@@ -333,20 +336,20 @@ const Clients = () => {
                                     <div className="bg-gray-50 rounded-lg p-4">
                                         <dl className="space-y-4">
                                             <div className="flex justify-between">
-                                                <dt className="text-sm font-medium text-gray-500">Identifiant</dt>
+                                                <dt className="text-sm font-medium text-gray-500">{t('clients.details.identifier')}</dt>
                                                 <dd className="text-sm text-gray-900">{selectedClient.id}</dd>
                                             </div>
                                             <div className="flex justify-between">
-                                                <dt className="text-sm font-medium text-gray-500">Dernière utilisation</dt>
+                                                <dt className="text-sm font-medium text-gray-500">{t('clients.details.lastUsed')}</dt>
                                                 <dd className="text-sm text-gray-900">
-                                                    {selectedClient.lastUsed ? new Date(selectedClient.lastUsed).toLocaleString() : 'Jamais utilisé'}
+                                                    {selectedClient.lastUsed ? new Date(selectedClient.lastUsed).toLocaleString() : t('clients.details.neverUsed')}
                                                 </dd>
                                             </div>
                                             <div className="flex justify-between">
-                                                <dt className="text-sm font-medium text-gray-500">Statut</dt>
+                                                <dt className="text-sm font-medium text-gray-500">{t('clients.details.status')}</dt>
                                                 <dd className="text-sm text-gray-900">
                                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        Actif
+                                                        {t('clients.details.active')}
                                                     </span>
                                                 </dd>
                                             </div>
@@ -355,7 +358,7 @@ const Clients = () => {
                                 </div>
 
                                 <div>
-                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Token d'authentification</h3>
+                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">{t('clients.details.authToken')}</h3>
                                     <div className="bg-gray-50 rounded-lg p-4">
                                         <div className="flex items-center mb-2">
                                             <div id={`token-${selectedClient.token}`} className="bg-white border border-gray-200 rounded px-3 py-2 font-mono text-sm text-gray-800 flex-1 overflow-x-auto">
@@ -364,7 +367,7 @@ const Clients = () => {
                                             <button
                                                 onClick={() => handleCopyToken(selectedClient.token)}
                                                 className="ml-2 inline-flex items-center p-2 border border-transparent rounded-md text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                                title="Copier le token"
+                                                title={t('clients.actions.copyToken')}
                                             >
                                                 <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -372,7 +375,7 @@ const Clients = () => {
                                             </button>
                                         </div>
                                         <p className="text-xs text-gray-500">
-                                            Ce token est utilisé pour authentifier les requêtes du client à l'API.
+                                            {t('clients.details.tokenDescription')}
                                         </p>
                                     </div>
                                 </div>
@@ -384,9 +387,9 @@ const Clients = () => {
                         <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun client sélectionné</h3>
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">{t('clients.noClientsSelected')}</h3>
                         <p className="mt-1 text-sm text-gray-500">
-                            Sélectionnez un client dans la liste ou créez-en un nouveau.
+                            {t('clients.noClientsSelectedDescription')}
                         </p>
                         <div className="mt-4">
                             <button
@@ -396,7 +399,7 @@ const Clients = () => {
                                 <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                                 </svg>
-                                Nouveau client
+                                {t('clients.actions.newClient')}
                             </button>
                         </div>
                     </div>
@@ -408,7 +411,7 @@ const Clients = () => {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onSave={handleSaveClient}
-                mode={modalMode}
+                modalMode={modalMode}
                 clientName={clientName}
                 setClientName={setClientName}
                 isProcessing={isProcessing}
@@ -422,10 +425,10 @@ const Clients = () => {
                     setClientToDelete(null);
                 }}
                 onConfirm={confirmDeleteClient}
-                title="Supprimer le client"
-                message={`Êtes-vous sûr de vouloir supprimer le client "${clientToDelete?.name}" ? Cette action est irréversible.`}
-                confirmText="Supprimer"
-                cancelText="Annuler"
+                title={t('clients.modals.deleteClient.title')}
+                message={t('clients.modals.deleteClient.message', { name: clientToDelete?.name })}
+                confirmText={t('actions.delete')}
+                cancelText={t('actions.cancel')}
                 isLoading={isDeleting}
                 type="danger"
             />

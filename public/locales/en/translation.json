@@ -152,5 +152,56 @@
                 "allowSize": "PNG, JPG, GIF up to 2MB"
             }
         }
+    },
+    "clients": {
+        "title": "Clients",
+        "sidebarTitle": "Clients",
+        "noClients": "No clients found",
+        "noClientsSelected": "No client selected",
+        "noClientsSelectedDescription": "Select a client in the list or create a new one.",
+        "actions": {
+            "newClient": "New client",
+            "editClient": "Edit client",
+            "deleteClient": "Delete client",
+            "copyToken": "Copy token"
+        },
+        "details": {
+            "name": "Name",
+            "description": "Description",
+            "identifier": "Identifier",
+            "lastUsed": "Last used",
+            "neverUsed": "Never used",
+            "status": "Status",
+            "active": "Active",
+            "inactive": "Inactive",
+            "token": "Token",
+            "authToken": "Authentication token",
+            "tokenCopied": "Token copied to clipboard",
+            "tokenUnavailable": "Token is unavailable",
+            "tokenDescription": "This token is used to authenticate the client to the server."
+        },
+        "errors": {
+            "loadingClientsFailed": "Error while loading clients",
+            "savingClientFailed": "Error while saving client",
+            "deletingClientFailed": "Error while deleting client",
+            "copyingTokenFailed": "Error while copying token"
+        },
+        "modals": {
+            "deleteClient": {
+                "title": "Delete client",
+                "message": "Are you sure you want to delete the client \"{{name}}\" ? This action is irreversible."
+            },
+            "createClient": {
+                "title": "Create client"
+            },
+            "updateClient": {
+                "title": "Update client"
+            },
+            "form": {
+                "name": "Name",
+                "namePlaceholder": "Enter the client name",
+                "description": "Description"
+            }
+        }
     }
 }
