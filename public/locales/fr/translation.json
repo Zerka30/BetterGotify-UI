@@ -17,7 +17,8 @@
         "copyCommand": "Copier la commande",
         "saving": "Enregistrement...",
         "deleting": "Suppression...",
-        "in_progress": "En cours..."
+        "in_progress": "En cours...",
+        "loading": "Chargement..."
     },
     "navigation": {
         "messages": "Messages",

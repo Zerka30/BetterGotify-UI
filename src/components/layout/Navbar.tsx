@@ -98,7 +98,7 @@ const Navbar = ({
                                 )}
                                 {isLoadingVersion && (
                                     <span className="ml-2 text-xs bg-blue-700 px-2 py-1 rounded-full animate-pulse">
-                                        Chargement...
+                                        {t('actions.loading')}
                                     </span>
                                 )}
                             </Link>

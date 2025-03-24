@@ -17,7 +17,8 @@
         "saving": "Saving...",
         "deleting": "Deleting...",
         "in_progress": "In progress...",
-        "copyCommand": "Copy command"
+        "copyCommand": "Copy command",
+        "loading": "Loading..."
     },
     "navigation": {
         "messages": "Messages",
