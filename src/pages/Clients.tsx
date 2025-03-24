@@ -6,7 +6,7 @@ import Layout from '../components/layout/Layout';
 import ClientModal from '../components/modals/Client';
 
 const Clients = () => {
-    // Client states
+    // States
     const [clients, setClients] = useState<Client[]>([]);
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
     const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
@@ -17,7 +17,7 @@ const Clients = () => {
     const [clientName, setClientName] = useState('');
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-    // UI states
+    // Loading and error states
     const [isLoading, setIsLoading] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -28,7 +28,9 @@ const Clients = () => {
         fetchClients();
     }, []);
 
-    // Generate a consistent color based on client name
+    /**
+     * Generate a consistent color based on client name
+     */
     const getClientColor = (clientName: string): string => {
         if (!clientName) return 'bg-gray-500';
 
@@ -42,7 +44,9 @@ const Clients = () => {
         return colors[sum % colors.length];
     };
 
-    // Get client initials for avatar
+    /**
+     * Get client initials for avatar
+     */
     const getClientInitials = (clientName: string): string => {
         if (!clientName) return '?';
         return clientName.split(' ')
@@ -52,36 +56,40 @@ const Clients = () => {
             .substring(0, 2);
     };
 
+    /**
+     * Fetch clients
+     */
     const fetchClients = async (): Promise<void> => {
         setIsLoading(true);
         setError(null);
         try {
             const fetchedClients = await clientService.getClients();
             setClients(fetchedClients);
-
-            // Select first client by default if none is selected
             if (fetchedClients.length > 0 && !selectedClient) {
                 setSelectedClient(fetchedClients[0]);
             }
         } catch (err) {
-            console.error('Error fetching clients:', err);
-            if (err instanceof ApiError) {
-                setError(`Erreur ${err.status}: ${err.message}`);
-            } else {
-                setError('Erreur lors du chargement des clients');
-            }
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors du chargement des clients';
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Modal handlers
+    /**
+     * Open the client creation modal
+     */
     const handleOpenCreateModal = (): void => {
         setModalMode('create');
         setClientName('');
         setIsModalOpen(true);
     };
 
+    /**
+     * Open the client edit modal
+     */
     const handleOpenEditModal = (client: Client): void => {
         setModalMode('edit');
         setClientName(client.name);
@@ -89,15 +97,22 @@ const Clients = () => {
         setIsModalOpen(true);
     };
 
+    /**
+     * Close the client modal
+     */
     const handleCloseModal = (): void => {
         setIsModalOpen(false);
         setClientName('');
     };
 
+    /**
+     * Save a client (creation or modification)
+     */
     const handleSaveClient = async (): Promise<void> => {
         if (!clientName.trim()) return;
 
         setIsProcessing(true);
+        setError(null);
         try {
             let updatedClient;
 
@@ -115,27 +130,31 @@ const Clients = () => {
 
             handleCloseModal();
         } catch (err) {
-            console.error('Error saving client:', err);
-            if (err instanceof ApiError) {
-                setError(`Erreur ${err.status}: ${err.message}`);
-            } else {
-                setError('Erreur lors de l\'enregistrement du client');
-            }
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors de l\'enregistrement du client';
+            setError(errorMessage);
         } finally {
             setIsProcessing(false);
         }
     };
 
-    // Delete handlers
+    /**
+     * Prepare client deletion
+     */
     const handleDeleteClient = (client: Client): void => {
         setClientToDelete(client);
         setIsConfirmModalOpen(true);
     };
 
+    /**
+     * Confirm and execute client deletion
+     */
     const confirmDeleteClient = async (): Promise<void> => {
         if (!clientToDelete) return;
 
         setIsDeleting(true);
+        setError(null);
         try {
             await clientService.deleteClient(clientToDelete.id);
 
@@ -155,22 +174,21 @@ const Clients = () => {
             setIsConfirmModalOpen(false);
             setClientToDelete(null);
         } catch (err) {
-            console.error('Error deleting client:', err);
-            if (err instanceof ApiError) {
-                setError(`Erreur ${err.status}: ${err.message}`);
-            } else {
-                setError('Erreur lors de la suppression du client');
-            }
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors de la suppression du client';
+            setError(errorMessage);
         } finally {
             setIsDeleting(false);
         }
     };
 
-    // Copy token to clipboard
+    /**
+     * Copy the token to the clipboard
+     */
     const handleCopyToken = (token: string): void => {
         navigator.clipboard.writeText(token)
             .then(() => {
-                // Visual feedback
                 const tokenElement = document.getElementById(`token-${token}`);
                 if (tokenElement) {
                     tokenElement.classList.add('bg-green-100');
@@ -180,11 +198,11 @@ const Clients = () => {
                 }
             })
             .catch(err => {
-                console.error('Error copying token:', err);
+                console.error('Erreur lors de la copie du token:', err);
             });
     };
 
-    // Sidebar content with client list
+    // Sidebar content with the clients list
     const sidebarContent = (
         <>
             {error ? (
@@ -224,7 +242,7 @@ const Clients = () => {
                 </ul>
             )}
 
-            {/* New client button at the bottom of the list */}
+            {/* Button to create a new client at the bottom of the list */}
             {clients.length > 0 && !isLoading && !error && (
                 <button
                     onClick={handleOpenCreateModal}
@@ -246,7 +264,7 @@ const Clients = () => {
             showSidebar={true}
         >
             <div className="p-6">
-                {/* Page title - only shown when no client is selected */}
+                {/* Page title - displayed only when no client is selected */}
                 {!selectedClient && (
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
@@ -269,7 +287,7 @@ const Clients = () => {
                                         {getClientInitials(selectedClient.name)}
                                     </div>
 
-                                    {/* Client info */}
+                                    {/* Client information */}
                                     <div className="ml-5">
                                         <h2 className="text-xl font-bold text-white tracking-tight">{selectedClient.name}</h2>
                                         <div className="flex items-center mt-1">
@@ -337,10 +355,10 @@ const Clients = () => {
                                 </div>
 
                                 <div>
-                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Token d'accès</h3>
+                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Token d'authentification</h3>
                                     <div className="bg-gray-50 rounded-lg p-4">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="bg-white border border-gray-200 rounded px-3 py-2 font-mono text-sm text-gray-800 flex-1 overflow-x-auto">
+                                        <div className="flex items-center mb-2">
+                                            <div id={`token-${selectedClient.token}`} className="bg-white border border-gray-200 rounded px-3 py-2 font-mono text-sm text-gray-800 flex-1 overflow-x-auto">
                                                 {selectedClient.token}
                                             </div>
                                             <button
@@ -354,7 +372,7 @@ const Clients = () => {
                                             </button>
                                         </div>
                                         <p className="text-xs text-gray-500">
-                                            Ce token est utilisé pour authentifier les requêtes du client à l'API Gotify.
+                                            Ce token est utilisé pour authentifier les requêtes du client à l'API.
                                         </p>
                                     </div>
                                 </div>
@@ -385,18 +403,18 @@ const Clients = () => {
                 )}
             </div>
 
-            {/* Create/Edit client modal */}
+            {/* Client modal */}
             <ClientModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onSave={handleSaveClient}
+                mode={modalMode}
                 clientName={clientName}
                 setClientName={setClientName}
-                modalMode={modalMode}
                 isProcessing={isProcessing}
             />
 
-            {/* Delete confirmation modal */}
+            {/* Confirmation modal for client deletion */}
             <ConfirmModal
                 isOpen={isConfirmModalOpen}
                 onClose={() => {

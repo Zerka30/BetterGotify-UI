@@ -5,31 +5,36 @@ import { ApiError } from '../services/api';
 import AppModal from '../components/modals/App';
 import ConfirmModal from '../components/modals/Confirm';
 import Layout from '../components/layout/Layout';
+import { getAppColor, getAppInitials, getImageUrl, hasValidImage } from '../utils/appUtils';
 
 const Dashboard = () => {
+    // States
     const [messages, setMessages] = useState<Message[]>([]);
     const [applications, setApplications] = useState<Application[]>([]);
     const [selectedAppId, setSelectedAppId] = useState<number | null>(null);
+
+    // Loading states
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingApps, setIsLoadingApps] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [appError, setAppError] = useState<string | null>(null);
     const [isDeletingAll, setIsDeletingAll] = useState(false);
 
-    // États pour le modal de création d'application    
+    // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
     const [modalApp, setModalApp] = useState<Application | null>(null);
-    const [newAppName, setNewAppName] = useState('');
-    const [newAppDescription, setNewAppDescription] = useState('');
-    const [isCreatingApp, setIsCreatingApp] = useState(false);
-    const [createAppError, setCreateAppError] = useState<string | null>(null);
-
-    // États pour le modal de confirmation
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [messageToDelete, setMessageToDelete] = useState<Message | null>(null);
     const [isConfirmAllModalOpen, setIsConfirmAllModalOpen] = useState(false);
 
+    // State for application management
+    const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+    const [appToDelete, setAppToDelete] = useState<Application | null>(null);
+
+    /**
+     * Fetch applications
+     */
     const fetchApplications = async () => {
         setIsLoadingApps(true);
         setAppError(null);
@@ -37,120 +42,102 @@ const Dashboard = () => {
             const apps = await applicationService.getApplications();
             setApplications(Array.isArray(apps) ? apps : []);
         } catch (err) {
-            console.error('Error fetching applications:', err);
-            setAppError('Impossible de charger les applications');
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Impossible de charger les applications';
+            setAppError(errorMessage);
             setApplications([]);
         } finally {
             setIsLoadingApps(false);
         }
     };
 
-    const fetchMessages = async () => {
+    /**
+     * Fetch messages, filtered by application if appId is provided
+     */
+    const fetchMessages = async (appId: number | null = selectedAppId) => {
         setIsLoading(true);
         setError(null);
+        setMessages([]); // Reset during loading
+
         try {
             let fetchedMessages;
-            if (selectedAppId) {
-                fetchedMessages = await messageService.getMessagesByApplication(selectedAppId);
+            if (appId) {
+                fetchedMessages = await messageService.getMessagesByApplication(appId);
             } else {
                 fetchedMessages = await messageService.getMessages();
             }
 
-            // Enrichir les messages avec les informations complètes des applications
+            // Enrich with application information
             const enrichedMessages = fetchedMessages.map(message => {
-                // Trouver l'application correspondante dans la liste des applications
                 const app = applications.find(app => app.id === message.appid);
-                return {
-                    ...message,
-                    application: app // Ajouter l'objet application complet au message
-                };
+                return { ...message, application: app };
             });
 
             setMessages(enrichedMessages);
         } catch (err) {
-            console.error('Error fetching messages:', err);
-            if (err instanceof ApiError) {
-                setError(`Erreur ${err.status}: ${err.message}`);
-            } else {
-                setError('Erreur lors du chargement des messages');
-            }
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors du chargement des messages';
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
     };
 
+    /**
+     * Handle application selection and load its messages
+     */
     const handleAppSelect = (appId: number | null) => {
         setSelectedAppId(appId);
-        setIsLoading(true);
-
-        // Réinitialiser les messages pendant le chargement
-        setMessages([]);
-
-        if (appId) {
-            messageService.getMessagesByApplication(appId)
-                .then(data => {
-                    setMessages(Array.isArray(data) ? data : []);
-                })
-                .catch(err => {
-                    console.error(`Error fetching messages for app ${appId}:`, err);
-                    if (err instanceof ApiError) {
-                        setError(`Erreur ${err.status}: ${err.message}`);
-                    } else {
-                        setError('Erreur lors du chargement des messages');
-                    }
-                    setMessages([]);
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                });
-        } else {
-            messageService.getMessages()
-                .then(data => {
-                    setMessages(Array.isArray(data) ? data : []);
-                })
-                .catch(err => {
-                    console.error('Error fetching all messages:', err);
-                    if (err instanceof ApiError) {
-                        setError(`Erreur ${err.status}: ${err.message}`);
-                    } else {
-                        setError('Erreur lors du chargement des messages');
-                    }
-                    setMessages([]);
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                });
-        }
+        fetchMessages(appId);
     };
 
+    /**
+     * Refresh messages list
+     */
     const handleRefresh = () => {
         fetchMessages();
     };
 
+    /**
+     * Prepare message deletion
+     */
     const handleDeleteMessage = (message: Message) => {
         setMessageToDelete(message);
         setIsConfirmModalOpen(true);
     };
 
+    /**
+     * Confirm and execute message deletion
+     */
     const confirmDeleteMessage = async () => {
         if (!messageToDelete) return;
 
         try {
             await messageService.deleteMessage(messageToDelete.id);
-            // Filtrer le message supprimé de la liste
+            // Filter deleted message from list
             setMessages(messages.filter(msg => msg.id !== messageToDelete.id));
             setIsConfirmModalOpen(false);
             setMessageToDelete(null);
         } catch (err) {
-            console.error(`Error deleting message ${messageToDelete.id}:`, err);
-            setError('Erreur lors de la suppression du message');
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors de la suppression du message';
+            setError(errorMessage);
         }
     };
 
+    /**
+     * Prepare all messages deletion
+     */
     const handleDeleteAllClick = () => {
         setIsConfirmAllModalOpen(true);
     };
 
+    /**
+     * Confirm and execute all messages deletion
+     */
     const confirmDeleteAll = async () => {
         setIsDeletingAll(true);
         setError(null);
@@ -164,113 +151,89 @@ const Dashboard = () => {
             setMessages([]);
             setIsConfirmAllModalOpen(false);
         } catch (err) {
-            console.error('Error deleting messages:', err);
-            if (err instanceof ApiError) {
-                setError(`Erreur ${err.status}: ${err.message}`);
-            } else {
-                setError('Erreur lors de la suppression des messages');
-            }
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors de la suppression des messages';
+            setError(errorMessage);
         } finally {
             setIsDeletingAll(false);
         }
     };
 
+    /**
+     * Open application creation modal
+     */
     const handleOpenCreateModal = () => {
         setModalMode('create');
         setModalApp(null);
         setIsModalOpen(true);
     };
 
-    const handleCloseCreateModal = () => {
+    /**
+     * Close application modal
+     */
+    const handleCloseModal = (): void => {
         setIsModalOpen(false);
     };
 
-    // Fonction pour créer une nouvelle application
-    const handleCreateApplication = async () => {
-        if (!newAppName.trim() || !newAppDescription.trim()) {
-            setCreateAppError('Le nom et la description sont requis');
-            return;
-        }
-
-        setIsCreatingApp(true);
-        setCreateAppError(null);
-
+    /**
+     * Save application (creation or modification)
+     */
+    const handleSaveApp = async (appData: Application, image?: File, deleteImage?: boolean): Promise<void> => {
         try {
-            await applicationService.createApplication(newAppName, newAppDescription);
-            fetchApplications();
-            handleCloseCreateModal();
+            setIsLoading(true);
+            let updatedApp;
+
+            if (appData.id === 0) {
+                updatedApp = await applicationService.createApplication(appData.name, appData.description);
+            } else {
+                updatedApp = await applicationService.updateApplication(appData.id, appData.name, appData.description);
+            }
+
+            // Image management
+            if (image) {
+                updatedApp = await applicationService.uploadApplicationImage(updatedApp.id, image);
+            } else if (deleteImage === true) {
+                await applicationService.deleteApplicationImage(updatedApp.id);
+                updatedApp = await applicationService.getApplication(updatedApp.id);
+            }
+
+            await fetchApplications();
+
+            // Update selected application if necessary
+            if (selectedApp && selectedApp.id === updatedApp.id) {
+                setSelectedApp(updatedApp);
+            }
+
+            setIsModalOpen(false);
         } catch (err) {
-            console.error('Error creating application:', err);
-            setCreateAppError('Erreur lors de la création de l\'application');
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors de la sauvegarde de l\'application';
+            setError(errorMessage);
         } finally {
-            setIsCreatingApp(false);
+            setIsLoading(false);
         }
     };
 
+    /**
+     * Prepare application deletion
+     */
+    const handleDeleteApp = (app: Application): void => {
+        setAppToDelete(app);
+        setIsConfirmModalOpen(true);
+    };
+
+    // Initial loading
     useEffect(() => {
-        // Ajouter un log pour voir les applications chargées
-        console.log("Applications chargées:", applications);
-
-        // Vérifier les images des applications
-        applications.forEach(app => {
-            console.log(`App ${app.id} (${app.name}) - Image:`, app.image);
-        });
-
         fetchApplications();
         fetchMessages();
     }, []);
 
-    // Ajouter un log pour voir les messages chargés
-    useEffect(() => {
-        console.log("Messages chargés:", messages);
-
-        // Vérifier les applications associées aux messages
-        messages.forEach(message => {
-            console.log(`Message ${message.id} - App:`, message.application);
-            if (message.application) {
-                console.log(`  App image:`, message.application.image);
-            }
-        });
-    }, [messages]);
-
-    // Fonction pour générer une couleur basée sur le nom de l'application
-    const getAppColor = (appName: string) => {
-        const colors = [
-            'bg-blue-500', 'bg-green-500', 'bg-yellow-500',
-            'bg-red-500', 'bg-purple-500', 'bg-pink-500',
-            'bg-indigo-500', 'bg-teal-500', 'bg-orange-500'
-        ];
-
-        const sum = appName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        return colors[sum % colors.length];
-    };
-
-    // Fonction pour obtenir les initiales de l'application
-    const getAppInitials = (appName: string) => {
-        if (!appName) return '?';
-        return appName.split(' ')
-            .map(word => word[0])
-            .join('')
-            .toUpperCase()
-            .substring(0, 2);
-    };
-
-    // Ajouter ces fonctions pour gérer les images d'applications
-    const getImageUrl = (imagePath: string | undefined) => {
-        if (!imagePath) return null;
-        if (imagePath === 'static/defaultapp.png') return null;
-        if (imagePath.startsWith('http')) return imagePath;
-        return `https://gotify.zerka.dev/${imagePath}`;
-    };
-
-    const hasValidImage = (app: Application | undefined) => {
-        return app?.image && app.image !== 'static/defaultapp.png';
-    };
-
-    // Contenu de la sidebar
+    // Sidebar content
     const sidebarContent = (
         <>
-            {/* Tous les messages */}
+            {/* All messages */}
             <button
                 onClick={() => handleAppSelect(null)}
                 className={`w-full text-left px-4 py-2 rounded-lg flex items-center space-x-3 ${selectedAppId === null
@@ -284,10 +247,9 @@ const Dashboard = () => {
                 <span>Tous les messages</span>
             </button>
 
-            {/* Séparateur */}
             <div className="border-t border-gray-200 my-4"></div>
 
-            {/* En-tête Applications */}
+            {/* Applications header */}
             <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider flex justify-between items-center">
                 <span>Applications</span>
                 {isLoadingApps && (
@@ -298,14 +260,14 @@ const Dashboard = () => {
                 )}
             </div>
 
-            {/* Erreur applications */}
+            {/* Applications error */}
             {appError && (
                 <div className="px-4 py-2 text-xs text-red-600 bg-red-50 rounded-md">
                     {appError}
                 </div>
             )}
 
-            {/* Liste des applications */}
+            {/* Applications list */}
             <div className="space-y-1">
                 {applications.length === 0 && !isLoadingApps && !appError ? (
                     <div className="px-4 py-2 text-sm text-gray-500">
@@ -321,9 +283,9 @@ const Dashboard = () => {
                                 : 'text-gray-700 hover:bg-gray-50'
                                 }`}
                         >
-                            {app.image && app.image !== 'static/defaultapp.png' ? (
+                            {hasValidImage(app) ? (
                                 <img
-                                    src={app.image.startsWith('http') ? app.image : `https://gotify.zerka.dev/${app.image}`}
+                                    src={getImageUrl(app.image)}
                                     alt={`${app.name} logo`}
                                     className="flex-shrink-0 h-8 w-8 rounded-md object-contain bg-white border border-gray-200"
                                 />
@@ -338,7 +300,7 @@ const Dashboard = () => {
                 )}
             </div>
 
-            {/* Bouton Ajouter une application */}
+            {/* Add application button */}
             <button
                 className="w-full text-left mt-4 px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg flex items-center space-x-3"
                 onClick={handleOpenCreateModal}
@@ -358,7 +320,7 @@ const Dashboard = () => {
             showSidebar={true}
         >
             <div className="p-6">
-                {/* Titre de la page */}
+                {/* Page title */}
                 <h1 className="text-2xl font-bold text-gray-900 mb-6">
                     {selectedAppId
                         ? applications.find(app => app.id === selectedAppId)?.name || 'Application'
@@ -366,7 +328,7 @@ const Dashboard = () => {
                     }
                 </h1>
 
-                {/* En-tête avec statistiques */}
+                {/* Header with statistics */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="bg-white rounded-lg shadow p-6">
                         <h3 className="text-lg font-medium text-gray-900 mb-2">Messages</h3>
@@ -382,7 +344,7 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Liste des messages */}
+                {/* Messages list */}
                 <div className="bg-white rounded-lg shadow mb-16">
                     <div className="p-6 border-b border-gray-200">
                         <div className="flex items-center justify-between">
@@ -450,27 +412,19 @@ const Dashboard = () => {
                             </div>
                         ) : (
                             messages.map((message) => {
-                                // Trouver l'application correspondante (au cas où elle n'aurait pas été ajoutée lors du chargement)
+                                // Find corresponding application
                                 const app = message.application || applications.find(app => app.id === message.appid);
-
-                                // Log pour le débogage
-                                console.log(`Rendu du message ${message.id}:`, message);
-                                console.log(`  AppID:`, message.appid);
-                                console.log(`  Application trouvée:`, app);
 
                                 return (
                                     <div key={message.id} className="p-6 hover:bg-gray-50">
                                         <div className="flex items-start space-x-4">
-                                            {/* Logo/Avatar de l'application */}
-                                            {app && app.image && app.image !== 'static/defaultapp.png' ? (
+                                            {/* Application logo/avatar */}
+                                            {app && hasValidImage(app) ? (
                                                 <img
-                                                    src={app.image.startsWith('http')
-                                                        ? app.image
-                                                        : `https://gotify.zerka.dev/${app.image}`}
+                                                    src={getImageUrl(app.image)}
                                                     alt={`${app.name || 'App'} logo`}
                                                     className="flex-shrink-0 h-12 w-12 rounded-md object-contain bg-white border border-gray-200"
                                                     onError={(e) => {
-                                                        console.error(`Erreur de chargement de l'image pour le message ${message.id}`);
                                                         e.currentTarget.style.display = 'none';
                                                         const parent = e.currentTarget.parentElement;
                                                         if (parent) {
@@ -487,7 +441,7 @@ const Dashboard = () => {
                                                 </div>
                                             )}
 
-                                            {/* Contenu du message */}
+                                            {/* Message content */}
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
                                                     <h3 className="text-lg font-medium text-gray-900 truncate">
@@ -498,7 +452,7 @@ const Dashboard = () => {
                                                             {new Date(message.date).toLocaleString()}
                                                         </span>
 
-                                                        {/* Bouton de suppression */}
+                                                        {/* Delete button */}
                                                         <button
                                                             onClick={() => handleDeleteMessage(message)}
                                                             className="text-gray-400 hover:text-red-500 focus:outline-none"
@@ -520,7 +474,7 @@ const Dashboard = () => {
                                                         {app?.name || 'Application inconnue'}
                                                     </span>
 
-                                                    {/* Indicateur de priorité */}
+                                                    {/* Priority indicator */}
                                                     {message.priority > 0 && (
                                                         <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${message.priority >= 8 ? 'bg-red-100 text-red-800' :
                                                             message.priority >= 4 ? 'bg-yellow-100 text-yellow-800' :
@@ -540,16 +494,16 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Modal de création d'application */}
+            {/* Application creation modal */}
             <AppModal
                 isOpen={isModalOpen}
-                onClose={handleCloseCreateModal}
-                onSave={handleCreateApplication}
+                onClose={handleCloseModal}
+                onSave={handleSaveApp}
                 mode={modalMode}
                 app={modalApp}
             />
 
-            {/* Modal de confirmation pour supprimer un message */}
+            {/* Confirmation modal for message deletion */}
             <ConfirmModal
                 isOpen={isConfirmModalOpen}
                 onClose={() => {
@@ -564,7 +518,7 @@ const Dashboard = () => {
                 type="danger"
             />
 
-            {/* Modal de confirmation pour supprimer tous les messages */}
+            {/* Confirmation modal for all messages deletion */}
             <ConfirmModal
                 isOpen={isConfirmAllModalOpen}
                 onClose={() => setIsConfirmAllModalOpen(false)}

@@ -3,14 +3,19 @@ import { Application, applicationService } from '../services/applications';
 import { ApiError } from '../services/api';
 import AppModal from '../components/modals/App';
 import ConfirmModal from '../components/modals/Confirm';
-import { useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
+import { getAppColor, getAppInitials, getImageUrl, hasValidImage } from '../utils/appUtils';
 
 const Applications = () => {
-    // Application states
+    // States
     const [applications, setApplications] = useState<Application[]>([]);
     const [selectedApp, setSelectedApp] = useState<Application | null>(null);
     const [appToDelete, setAppToDelete] = useState<Application | null>(null);
+
+    // Loading states
+    const [isLoading, setIsLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,49 +23,17 @@ const Applications = () => {
     const [modalApp, setModalApp] = useState<Application | null>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-    // UI states
-    const [isLoading, setIsLoading] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    // State for token visibility
     const [isTokenVisible, setIsTokenVisible] = useState(false);
-
-    const navigate = useNavigate();
-
-    // Generate a consistent color based on app name
-    const getAppColor = (name: string) => {
-        const colors = [
-            'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500',
-            'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500'
-        ];
-        const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-        return colors[index];
-    };
-
-    const getAppInitials = (name: string): string => {
-        return name
-            .split(' ')
-            .map(word => word.charAt(0))
-            .join('')
-            .toUpperCase()
-            .substring(0, 2);
-    };
-
-    const getImageUrl = (imagePath: string | undefined): string | null => {
-        if (!imagePath) return null;
-        if (imagePath === 'static/defaultapp.png') return null;
-        if (imagePath.startsWith('http')) return imagePath;
-        return `https://gotify.zerka.dev/${imagePath}`;
-    };
-
-    const hasValidImage = (app: Application): boolean => {
-        return Boolean(app.image && app.image !== 'static/defaultapp.png');
-    };
 
     // Load applications on component mount
     useEffect(() => {
         fetchApplications();
     }, []);
 
+    /**
+     * Fetch applications
+     */
     const fetchApplications = async (): Promise<void> => {
         setIsLoading(true);
         setError(null);
@@ -68,35 +41,44 @@ const Applications = () => {
             const apps = await applicationService.getApplications();
             setApplications(Array.isArray(apps) ? apps : []);
         } catch (err) {
-            console.error('Error fetching applications:', err);
-            if (err instanceof ApiError) {
-                setError(`Erreur ${err.status}: ${err.message}`);
-            } else {
-                setError('Erreur lors du chargement des applications');
-            }
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors du chargement des applications';
+            setError(errorMessage);
             setApplications([]);
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Modal handlers
+    /**
+     * Open the application creation modal
+     */
     const handleOpenCreateModal = (): void => {
         setModalMode('create');
         setModalApp(null);
         setIsModalOpen(true);
     };
 
+    /**
+     * Open the application edit modal
+     */
     const handleOpenEditModal = (app: Application): void => {
         setModalMode('edit');
         setModalApp(app);
         setIsModalOpen(true);
     };
 
+    /**
+     * Close the application modal
+     */
     const handleCloseModal = (): void => {
         setIsModalOpen(false);
     };
 
+    /**
+     * Save an application (creation or modification)
+     */
     const handleSaveApp = async (appData: Application, image?: File, deleteImage?: boolean): Promise<void> => {
         try {
             setIsLoading(true);
@@ -108,7 +90,7 @@ const Applications = () => {
                 updatedApp = await applicationService.updateApplication(appData.id, appData.name, appData.description);
             }
 
-            // Handle image upload or deletion
+            // Image management
             if (image) {
                 updatedApp = await applicationService.uploadApplicationImage(updatedApp.id, image);
             } else if (deleteImage === true) {
@@ -118,24 +100,33 @@ const Applications = () => {
 
             await fetchApplications();
 
-            // Update selected app if needed
+            // Update selected application if necessary
             if (selectedApp && selectedApp.id === updatedApp.id) {
                 setSelectedApp(updatedApp);
             }
 
             setIsModalOpen(false);
-        } catch (error) {
-            console.error('Error saving application:', error);
+        } catch (err) {
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors de la sauvegarde de l\'application';
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
     };
 
+    /**
+     * Prepare application deletion
+     */
     const handleDeleteApp = (app: Application): void => {
         setAppToDelete(app);
         setIsConfirmModalOpen(true);
     };
 
+    /**
+     * Confirm and execute application deletion
+     */
     const confirmDeleteApp = async (): Promise<void> => {
         if (!appToDelete) return;
 
@@ -143,78 +134,64 @@ const Applications = () => {
         try {
             await applicationService.deleteApplication(appToDelete.id);
 
-            setApplications(applications.filter(app => app.id !== appToDelete.id));
+            // Update applications list
+            const updatedApps = applications.filter(app => app.id !== appToDelete.id);
+            setApplications(updatedApps);
 
-            // Handle selected app after deletion
+            // Update selected application after deletion
             if (selectedApp && selectedApp.id === appToDelete.id) {
-                const nextApp = applications.find(app => app.id !== appToDelete.id);
-                if (nextApp) {
-                    setSelectedApp(nextApp);
+                if (updatedApps.length > 0) {
+                    setSelectedApp(updatedApps[0]);
                 } else {
-                    navigate('/');
+                    setSelectedApp(null);
                 }
             }
 
             setIsConfirmModalOpen(false);
             setAppToDelete(null);
-        } catch (error) {
-            console.error('Error deleting application:', error);
-            setError('Erreur lors de la suppression de l\'application');
+        } catch (err) {
+            const errorMessage = err instanceof ApiError
+                ? `Erreur ${err.status}: ${err.message}`
+                : 'Erreur lors de la suppression de l\'application';
+            setError(errorMessage);
         } finally {
             setIsDeleting(false);
         }
     };
 
-    const handleSelectApp = (app: Application): void => {
-        setSelectedApp(app);
-    };
-
-    // Token management
-    const handleCopyToken = (token: string): void => {
-        navigator.clipboard.writeText(token)
+    /**
+     * Copy the token to the clipboard
+     */
+    const handleCopyToken = (text: string): void => {
+        navigator.clipboard.writeText(text)
             .then(() => {
-                alert('Token copié dans le presse-papiers');
+                // Feedback visuel
+                const tokenElement = document.querySelector('.token-display');
+                if (tokenElement) {
+                    tokenElement.classList.add('bg-green-100');
+                    setTimeout(() => {
+                        tokenElement.classList.remove('bg-green-100');
+                    }, 1000);
+                }
             })
             .catch(err => {
-                console.error('Erreur lors de la copie du token:', err);
-                alert('Erreur lors de la copie du token');
+                setError('Erreur lors de la copie du token');
             });
     };
 
+    /**
+     * Toggle the token visibility
+     */
     const toggleTokenVisibility = (): void => {
         setIsTokenVisible(!isTokenVisible);
     };
 
-    // Render app icon or initials placeholder
-    const renderAppIcon = (app: Application) => {
-        if (hasValidImage(app)) {
-            return (
-                <img
-                    src={getImageUrl(app.image)}
-                    alt={`${app.name} logo`}
-                    className="flex-shrink-0 h-8 w-8 rounded-md object-contain bg-white border border-gray-200"
-                />
-            );
-        }
-
-        return (
-            <div className={`flex-shrink-0 h-8 w-8 rounded-md flex items-center justify-center text-white ${getAppColor(app.name)}`}>
-                {getAppInitials(app.name)}
-            </div>
-        );
-    };
-
-    // Sidebar content with app list
+    // Sidebar content with the applications list
     const sidebarContent = (
         <>
-            {/* List of applications */}
             {error ? (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
                     {error}
-                </div>
-            ) : !Array.isArray(applications) ? (
-                <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-md text-sm">
-                    Erreur de chargement des applications
                 </div>
             ) : applications.length === 0 ? (
                 <div className="text-center">
@@ -230,16 +207,36 @@ const Applications = () => {
                 </div>
             ) : (
                 <ul className="space-y-1">
-                    {applications.map(app => (
+                    {applications.map((app) => (
                         <li key={app.id}>
                             <button
-                                onClick={() => handleSelectApp(app)}
+                                onClick={() => setSelectedApp(app)}
                                 className={`w-full text-left px-4 py-2 rounded-lg flex items-center space-x-3 ${selectedApp?.id === app.id
                                     ? 'bg-blue-50 text-blue-700'
                                     : 'text-gray-700 hover:bg-gray-50'
                                     }`}
                             >
-                                {renderAppIcon(app)}
+                                {hasValidImage(app) ? (
+                                    <img
+                                        src={getImageUrl(app.image)}
+                                        alt={`${app.name} logo`}
+                                        className="flex-shrink-0 h-8 w-8 rounded-md object-contain bg-white border border-gray-200"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                            const parent = e.currentTarget.parentElement;
+                                            if (parent) {
+                                                const div = document.createElement('div');
+                                                div.className = `flex-shrink-0 h-8 w-8 rounded-md flex items-center justify-center text-white font-bold ${getAppColor(app.name)}`;
+                                                div.textContent = getAppInitials(app.name);
+                                                parent.appendChild(div);
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    <div className={`flex-shrink-0 h-8 w-8 rounded-md flex items-center justify-center text-white font-bold ${getAppColor(app.name)}`}>
+                                        {getAppInitials(app.name)}
+                                    </div>
+                                )}
                                 <span className="ml-2 truncate">{app.name}</span>
                             </button>
                         </li>
@@ -247,6 +244,7 @@ const Applications = () => {
                 </ul>
             )}
 
+            {/* Button to create a new application at the bottom of the list */}
             {applications.length > 0 && !isLoading && !error && (
                 <button
                     onClick={handleOpenCreateModal}
@@ -268,7 +266,7 @@ const Applications = () => {
             showSidebar={true}
         >
             <div className="p-6">
-                {/* Page title - only displayed when no app is selected */}
+                {/* Page title - displayed only when no application is selected */}
                 {!selectedApp && (
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-2xl font-bold text-gray-900">Applications</h1>
@@ -280,31 +278,27 @@ const Applications = () => {
                     <div className="bg-white rounded-lg shadow overflow-hidden">
                         {/* Header with image/initials and actions */}
                         <div className="relative">
-                            {/* Background with a more subtle and elegant gradient, but lower */}
+                            {/* Background with a more subtle and elegant gradient */}
                             <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
-
-                            {/* Overlay with a subtle pattern to add texture */}
                             <div className="absolute inset-0 bg-opacity-10 bg-pattern"></div>
 
                             {/* Header content with better spacing */}
                             <div className="absolute inset-0 flex items-center justify-between px-8">
                                 <div className="flex items-center">
-                                    {/* Image or initials with a softer shadow and border effect, but smaller */}
+                                    {/* Application logo */}
                                     {hasValidImage(selectedApp) ? (
-                                        <div className="p-1 bg-white rounded-xl shadow-lg">
-                                            <img
-                                                src={getImageUrl(selectedApp.image)}
-                                                alt={`${selectedApp.name} logo`}
-                                                className="h-16 w-16 rounded-lg object-contain"
-                                            />
-                                        </div>
+                                        <img
+                                            src={getImageUrl(selectedApp.image)}
+                                            alt={`${selectedApp.name} logo`}
+                                            className="h-16 w-16 rounded-xl object-contain bg-white border-2 border-white border-opacity-20 shadow-lg"
+                                        />
                                     ) : (
                                         <div className={`h-16 w-16 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg border-2 border-white border-opacity-20 ${getAppColor(selectedApp.name)}`}>
                                             {getAppInitials(selectedApp.name)}
                                         </div>
                                     )}
 
-                                    {/* Informations with an improved typography */}
+                                    {/* Application information */}
                                     <div className="ml-5">
                                         <h2 className="text-xl font-bold text-white tracking-tight">{selectedApp.name}</h2>
                                         <div className="flex items-center mt-1">
@@ -313,7 +307,7 @@ const Applications = () => {
                                     </div>
                                 </div>
 
-                                {/* Action buttons with a more modern design */}
+                                {/* Action buttons */}
                                 <div className="flex space-x-3">
                                     <button
                                         onClick={() => handleOpenEditModal(selectedApp)}
@@ -387,7 +381,7 @@ const Applications = () => {
                                     <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Token d'authentification</h3>
                                     <div className="bg-gray-50 rounded-lg p-4">
                                         <div className="flex items-center mb-2">
-                                            <div className="bg-white border border-gray-200 rounded px-3 py-2 font-mono text-sm text-gray-800 flex-1 overflow-x-auto">
+                                            <div className="bg-white border border-gray-200 rounded px-3 py-2 font-mono text-sm text-gray-800 flex-1 overflow-x-auto token-display">
                                                 {selectedApp.token ?
                                                     (isTokenVisible ? selectedApp.token : '••••••••••••••••')
                                                     : 'Token non disponible'}
@@ -399,21 +393,20 @@ const Applications = () => {
                                                         className="ml-2 inline-flex items-center p-2 border border-transparent rounded-md text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                                         title={isTokenVisible ? "Masquer le token" : "Afficher le token"}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                                d={isTokenVisible
-                                                                    ? "M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                                                                    : "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                }
-                                                            />
+                                                        <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            {isTokenVisible ? (
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                                            ) : (
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            )}
                                                         </svg>
                                                     </button>
                                                     <button
-                                                        onClick={() => handleCopyToken(selectedApp.token || '')}
-                                                        className="ml-2 inline-flex items-center p-2 border border-transparent rounded-md text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                        onClick={() => handleCopyToken(selectedApp.token)}
+                                                        className="ml-1 inline-flex items-center p-2 border border-transparent rounded-md text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                                         title="Copier le token"
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                                         </svg>
                                                     </button>
@@ -421,7 +414,7 @@ const Applications = () => {
                                             )}
                                         </div>
                                         <p className="text-xs text-gray-500">
-                                            Ce token est utilisé pour authentifier les requêtes à l'API Gotify.
+                                            Ce token est utilisé pour authentifier les requêtes de l'application à l'API Gotify.
                                         </p>
                                     </div>
                                 </div>
@@ -493,7 +486,7 @@ const Applications = () => {
                 }}
                 onConfirm={confirmDeleteApp}
                 title="Supprimer l'application"
-                message={`Êtes-vous sûr de vouloir supprimer l'application "${appToDelete?.name}" ? Cette action est irréversible et supprimera également tous les messages associés.`}
+                message={`Êtes-vous sûr de vouloir supprimer l'application "${appToDelete?.name}" ? Cette action est irréversible.`}
                 confirmText="Supprimer"
                 cancelText="Annuler"
                 isLoading={isDeleting}
