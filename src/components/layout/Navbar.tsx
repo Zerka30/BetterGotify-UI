@@ -55,14 +55,6 @@ const Navbar = ({
         return false;
     };
 
-    // Fonction pour fermer le menu et ouvrir la sidebar
-    const handleMobileMenuAndSidebar = () => {
-        setIsMenuOpen(false);
-        if (onToggleSidebar) {
-            onToggleSidebar();
-        }
-    };
-
     return (
         <nav className="bg-blue-600 text-white">
             <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
