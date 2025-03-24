@@ -60,6 +60,15 @@ const Sidebar = ({
         onClose();
     };
 
+    const handleNavItemClick = () => {
+        if (isMobileView) {
+            // Ajouter une légère temporisation pour permettre à l'animation de se produire
+            setTimeout(() => {
+                onClose();
+            }, 150);
+        }
+    };
+
     const navItems = [
         {
             name: 'Messages',
@@ -169,7 +178,7 @@ const Sidebar = ({
                                         ? 'bg-blue-50 text-blue-700'
                                         : 'text-gray-700 hover:bg-gray-50'
                                         }`}
-                                    onClick={onClose}
+                                    onClick={handleNavItemClick}
                                 >
                                     <span className={`mr-3 ${isActive(item.path) ? 'text-blue-600' : 'text-gray-500'}`}>
                                         {item.icon}
@@ -213,7 +222,7 @@ const Sidebar = ({
                 </div>
 
                 {/* Contenu de la sidebar */}
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto" onClick={isMobileView ? handleNavItemClick : undefined}>
                     {children}
                 </div>
             </div>
