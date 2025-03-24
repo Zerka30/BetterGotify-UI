@@ -5,6 +5,7 @@ import AppModal from '../components/modals/App';
 import ConfirmModal from '../components/modals/Confirm';
 import Layout from '../components/layout/Layout';
 import { getAppColor, getAppInitials, getImageUrl, hasValidImage } from '../utils/appUtils';
+import { useTranslation } from 'react-i18next';
 
 const Applications = () => {
     // States
@@ -26,6 +27,9 @@ const Applications = () => {
     // State for token visibility
     const [isTokenVisible, setIsTokenVisible] = useState(false);
 
+    // Translation
+    const { t } = useTranslation();
+
     // Load applications on component mount
     useEffect(() => {
         fetchApplications();
@@ -43,7 +47,7 @@ const Applications = () => {
         } catch (err) {
             const errorMessage = err instanceof ApiError
                 ? `Erreur ${err.status}: ${err.message}`
-                : 'Erreur lors du chargement des applications';
+                : t('applications.errors.loadingFailed');
             setError(errorMessage);
             setApplications([]);
         } finally {
@@ -108,8 +112,8 @@ const Applications = () => {
             setIsModalOpen(false);
         } catch (err) {
             const errorMessage = err instanceof ApiError
-                ? `Erreur ${err.status}: ${err.message}`
-                : 'Erreur lors de la sauvegarde de l\'application';
+                ? t('common.error') + ' ' + err.status + ': ' + err.message
+                : t('applications.errors.savingFailed');
             setError(errorMessage);
         } finally {
             setIsLoading(false);
@@ -151,8 +155,8 @@ const Applications = () => {
             setAppToDelete(null);
         } catch (err) {
             const errorMessage = err instanceof ApiError
-                ? `Erreur ${err.status}: ${err.message}`
-                : 'Erreur lors de la suppression de l\'application';
+                ? t('common.error') + ' ' + err.status + ': ' + err.message
+                : t('applications.errors.deletingFailed');
             setError(errorMessage);
         } finally {
             setIsDeleting(false);
@@ -175,7 +179,7 @@ const Applications = () => {
                 }
             })
             .catch(err => {
-                setError('Erreur lors de la copie du token');
+                setError(t('applications.errors.copyingTokenFailed'));
             });
     };
 
@@ -202,7 +206,7 @@ const Applications = () => {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        <span className="ml-2">Nouvelle application</span>
+                        <span className="ml-2">{t('applications.actions.newApplication')}</span>
                     </button>
                 </div>
             ) : (
@@ -253,7 +257,7 @@ const Applications = () => {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    <span className="ml-2">Nouvelle application</span>
+                    <span className="ml-2">{t('applications.actions.newApplication')}</span>
                 </button>
             )}
         </>
@@ -262,14 +266,14 @@ const Applications = () => {
     return (
         <Layout
             sidebarContent={sidebarContent}
-            sidebarTitle="Applications"
+            sidebarTitle={t('applications.sidebarTitle')}
             showSidebar={true}
         >
             <div className="p-6">
                 {/* Page title - displayed only when no application is selected */}
                 {!selectedApp && (
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-2xl font-bold text-gray-900">Applications</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">{t('applications.title')}</h1>
                     </div>
                 )}
 
@@ -317,7 +321,7 @@ const Applications = () => {
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
-                                            Modifier
+                                            {t('actions.edit')}
                                         </span>
                                     </button>
                                     <button
@@ -329,7 +333,7 @@ const Applications = () => {
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                            Supprimer
+                                            {t('actions.delete')}
                                         </span>
                                     </button>
                                 </div>
@@ -340,18 +344,18 @@ const Applications = () => {
                         <div className="px-6 py-5">
                             {selectedApp.description && (
                                 <div className="mb-6">
-                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Description</h3>
+                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">{t('applications.details.description')}</h3>
                                     <p className="text-gray-700">{selectedApp.description}</p>
                                 </div>
                             )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
-                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Détails</h3>
+                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">{t('applications.details.details')}</h3>
                                     <div className="bg-gray-50 rounded-lg p-4">
                                         <dl className="space-y-4">
                                             <div className="flex justify-between">
-                                                <dt className="text-sm font-medium text-gray-500">Priorité par défaut</dt>
+                                                <dt className="text-sm font-medium text-gray-500">{t('applications.details.defaultPriority')}</dt>
                                                 <dd className="text-sm text-gray-900">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${selectedApp.defaultPriority >= 7 ? 'bg-red-100 text-red-800' :
                                                         selectedApp.defaultPriority >= 4 ? 'bg-yellow-100 text-yellow-800' :
@@ -362,15 +366,15 @@ const Applications = () => {
                                                 </dd>
                                             </div>
                                             <div className="flex justify-between">
-                                                <dt className="text-sm font-medium text-gray-500">Dernière utilisation</dt>
+                                                <dt className="text-sm font-medium text-gray-500">{t('applications.details.lastUsed')}</dt>
                                                 <dd className="text-sm text-gray-900">
-                                                    {selectedApp.lastUsed ? new Date(selectedApp.lastUsed).toLocaleString() : 'Jamais utilisée'}
+                                                    {selectedApp.lastUsed ? new Date(selectedApp.lastUsed).toLocaleString() : t('applications.details.neverUsed')}
                                                 </dd>
                                             </div>
                                             <div className="flex justify-between">
-                                                <dt className="text-sm font-medium text-gray-500">Application interne</dt>
+                                                <dt className="text-sm font-medium text-gray-500">{t('applications.details.internal')}</dt>
                                                 <dd className="text-sm text-gray-900">
-                                                    {selectedApp.internal ? 'Oui' : 'Non'}
+                                                    {selectedApp.internal ? t('common.yes') : t('common.no')}
                                                 </dd>
                                             </div>
                                         </dl>
@@ -378,20 +382,20 @@ const Applications = () => {
                                 </div>
 
                                 <div>
-                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Token d'authentification</h3>
+                                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">{t('applications.details.authToken')}</h3>
                                     <div className="bg-gray-50 rounded-lg p-4">
                                         <div className="flex items-center mb-2">
                                             <div className="bg-white border border-gray-200 rounded px-3 py-2 font-mono text-sm text-gray-800 flex-1 overflow-x-auto token-display">
                                                 {selectedApp.token ?
                                                     (isTokenVisible ? selectedApp.token : '••••••••••••••••')
-                                                    : 'Token non disponible'}
+                                                    : t('applications.details.tokenUnavailable')}
                                             </div>
                                             {selectedApp.token && (
                                                 <>
                                                     <button
                                                         onClick={toggleTokenVisibility}
                                                         className="ml-2 inline-flex items-center p-2 border border-transparent rounded-md text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                                        title={isTokenVisible ? "Masquer le token" : "Afficher le token"}
+                                                        title={isTokenVisible ? t('applications.details.hideToken') : t('applications.details.showToken')}
                                                     >
                                                         <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             {isTokenVisible ? (
@@ -414,28 +418,28 @@ const Applications = () => {
                                             )}
                                         </div>
                                         <p className="text-xs text-gray-500">
-                                            Ce token est utilisé pour authentifier les requêtes de l'application à l'API Gotify.
+                                            {t('applications.details.tokenDescription')}
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Exemples d'utilisation</h3>
+                                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">{t('applications.details.exampleTitle')}</h3>
                                 <div className="bg-gray-50 rounded-lg p-4">
                                     <div className="mb-2 flex items-center justify-between">
-                                        <p className="text-sm font-medium text-gray-700">Envoyer un message avec cURL</p>
+                                        <p className="text-sm font-medium text-gray-700">{t('applications.details.exampleSubtitle')}</p>
                                         <button
                                             onClick={() => handleCopyToken(`curl -X POST \\\n  "${window.location.origin}/message" \\\n  -H "X-Gotify-Key: ${selectedApp.token || 'VOTRE_TOKEN'}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"message":"Hello from cURL", "title":"Notification", "priority":${selectedApp.defaultPriority || 5}}'`)}
                                             className="text-xs text-blue-600 hover:text-blue-800"
                                         >
-                                            Copier la commande
+                                            {t('actions.copyCommand')}
                                         </button>
                                     </div>
                                     <pre className="bg-gray-800 text-white p-3 rounded text-xs overflow-x-auto">
                                         {`curl -X POST \\
   "${window.location.origin}/message" \\
-  -H "Authorization: Bearer ${selectedApp.token || 'VOTRE_TOKEN'}" \\
+  -H "Authorization: Bearer ${selectedApp.token || t('applications.details.yourToken')}" \\
   -F "title=Notification" \\
   -F "message=Hello from cURL" \\
   -F "priority=${selectedApp.defaultPriority || 5}"`}
@@ -449,9 +453,11 @@ const Applications = () => {
                         <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                         </svg>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">Aucune application sélectionnée</h3>
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">
+                            {t('applications.noApplicationsSelected')}
+                        </h3>
                         <p className="mt-1 text-sm text-gray-500">
-                            Sélectionnez une application dans la liste ou créez-en une nouvelle.
+                            {t('applications.noApplicationsSelectedDescription')}
                         </p>
                         <div className="mt-4">
                             <button
@@ -461,7 +467,7 @@ const Applications = () => {
                                 <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                                 </svg>
-                                Nouvelle application
+                                {t('applications.actions.newApplication')}
                             </button>
                         </div>
                     </div>
@@ -485,10 +491,10 @@ const Applications = () => {
                     setAppToDelete(null);
                 }}
                 onConfirm={confirmDeleteApp}
-                title="Supprimer l'application"
-                message={`Êtes-vous sûr de vouloir supprimer l'application "${appToDelete?.name}" ? Cette action est irréversible.`}
-                confirmText="Supprimer"
-                cancelText="Annuler"
+                title={t('applications.modals.deleteApplication.title')}
+                message={t('applications.modals.deleteApplication.message', { name: appToDelete?.name })}
+                confirmText={t('applications.delete')}
+                cancelText={t('applications.cancel')}
                 isLoading={isDeleting}
                 type="danger"
             />

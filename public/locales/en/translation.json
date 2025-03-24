@@ -1,4 +1,9 @@
 {
+    "common": {
+        "yes": "Yes",
+        "no": "No",
+        "error": "Error"
+    },
     "actions": {
         "save": "Save",
         "cancel": "Cancel",
@@ -8,7 +13,11 @@
         "create": "Create",
         "update": "Update",
         "confirm": "Confirm",
-        "refresh": "Refresh"
+        "refresh": "Refresh",
+        "saving": "Saving...",
+        "deleting": "Deleting...",
+        "in_progress": "In progress...",
+        "copyCommand": "Copy command"
     },
     "navigation": {
         "messages": "Messages",
@@ -38,6 +47,7 @@
     },
     "users": {
         "title": "Users management",
+        "sidebarTitle": "Users",
         "newUser": "New user",
         "noUsers": "No users found",
         "user": {
@@ -53,6 +63,55 @@
             }
         }
     },
+    "applications": {
+        "title": "Applications",
+        "sidebarTitle": "Applications",
+        "noApplications": "No applications found",
+        "noApplicationsSelected": "No application selected",
+        "noApplicationsSelectedDescription": "Select an application in the list or create a new one.",
+        "actions": {
+            "newApplication": "New application",
+            "editApplication": "Edit application",
+            "deleteApplication": "Delete application",
+            "copyToken": "Copy token",
+            "showToken": "Show token",
+            "hideToken": "Hide token"
+        },
+        "details": {
+            "description": "Description",
+            "details": "Details",
+            "defaultPriority": "Default priority",
+            "lastUsed": "Last used",
+            "neverUsed": "Never used",
+            "internal": "Internal application",
+            "token": "Token",
+            "authToken": "Authentication token",
+            "tokenCopied": "Token copied to clipboard",
+            "tokenUnavailable": "Token is unavailable",
+            "tokenDescription": "This token is used to authenticate the application to the server.",
+            "yourToken": "Your token",
+            "exampleTitle": "Usage example",
+            "exampleSubtitle": "Send a message using cURL"
+        },
+        "messages": {
+            "name": "Messages",
+            "recentMessages": "Recent messages",
+            "allMessages": "All messages",
+            "noMessages": "No messages found"
+        },
+        "errors": {
+            "loadingFailed": "Error while loading messages",
+            "savingFailed": "Error while saving application",
+            "deletingFailed": "Error while deleting application",
+            "copyingTokenFailed": "Error while copying token"
+        },
+        "modals": {
+            "deleteApplication": {
+                "title": "Delete application",
+                "message": "Are you sure you want to delete the application \"{{name}}\" ? This action is irreversible."
+            }
+        }
+    },
     "errors": {
         "user": {
             "name": "Username is required",
@@ -61,6 +120,10 @@
             "passwordMismatch": "Passwords do not match",
             "errorCreating": "An error occurred while creating the user",
             "errorUpdating": "An error occurred while updating the user"
+        },
+        "application": {
+            "errorSaving": "An error occurred while saving the application",
+            "errorDeleting": "An error occurred while deleting the application"
         }
     }
 }

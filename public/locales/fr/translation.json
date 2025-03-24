@@ -8,7 +8,8 @@
         "create": "Créer",
         "update": "Mettre à jour",
         "confirm": "Confirmer",
-        "refresh": "Rafraîchir"
+        "refresh": "Rafraîchir",
+        "copyCommand": "Copier la commande"
     },
     "navigation": {
         "messages": "Messages",
@@ -51,6 +52,55 @@
             "role": {
                 "admin": "Administrateur",
                 "user": "Utilisateur"
+            }
+        }
+    },
+    "applications": {
+        "title": "Applications",
+        "sidebarTitle": "Applications",
+        "noApplications": "Aucune application trouvée",
+        "noApplicationsSelected": "Aucune application sélectionnée",
+        "noApplicationsSelectedDescription": "Sélectionnez une application dans la liste ou créez une nouvelle.",
+        "actions": {
+            "newApplication": "Nouvelle application",
+            "editApplication": "Modifier l'application",
+            "deleteApplication": "Supprimer l'application",
+            "copyToken": "Copier le token",
+            "showToken": "Afficher le token",
+            "hideToken": "Masquer le token"
+        },
+        "details": {
+            "description": "Description",
+            "details": "Détails",
+            "defaultPriority": "Priorité par défaut",
+            "lastUsed": "Dernière utilisation",
+            "neverUsed": "Jamais utilisé",
+            "internal": "Application interne",
+            "token": "Token",
+            "authToken": "Token d'authentification",
+            "tokenCopied": "Token copié dans le presse-papiers",
+            "tokenUnavailable": "Token non disponible",
+            "tokenDescription": "Ce token est utilisé pour authentifier l'application au serveur.",
+            "yourToken": "Votre token",
+            "exampleTitle": "Exemple d'utilisation",
+            "exampleSubtitle": "Envoyer un message en utilisant cURL"
+        },
+        "messages": {
+            "name": "Messages",
+            "recentMessages": "Recent messages",
+            "allMessages": "All messages",
+            "noMessages": "Aucun message trouvé"
+        },
+        "errors": {
+            "loadingFailed": "Erreur lors du chargement des messages",
+            "savingFailed": "Erreur lors de la sauvegarde de l'application",
+            "deletingFailed": "Erreur lors de la suppression de l'application",
+            "copyingTokenFailed": "Erreur lors de la copie du token"
+        },
+        "modals": {
+            "deleteApplication": {
+                "title": "Delete application",
+                "message": "Are you sure you want to delete the application \"{{name}}\" ? This action is irreversible."
             }
         }
     },
