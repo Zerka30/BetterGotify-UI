@@ -10,8 +10,6 @@ interface AppModalProps {
 }
 
 const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, onSave, mode, app }) => {
-    console.log("AppModal render - isOpen:", isOpen, "mode:", mode); // Log pour déboguer
-
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [image, setImage] = useState<File | null>(null);
@@ -32,7 +30,6 @@ const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, onSave, mode, app 
     };
 
     useEffect(() => {
-        console.log("AppModal useEffect - isOpen:", isOpen, "app:", app); // Log pour déboguer
         if (isOpen) {
             if (mode === 'edit' && app) {
                 setName(app.name || '');
@@ -96,7 +93,7 @@ const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, onSave, mode, app 
 
             onSave(appData, image || undefined, deleteCurrentImage);
         } catch (err) {
-            console.error('Error submitting app:', err);
+            console.error('Erreur détaillée lors de l\'enregistrement:', err);
             setError('Une erreur est survenue lors de l\'enregistrement de l\'application');
         } finally {
             setIsSubmitting(false);
@@ -104,7 +101,6 @@ const AppModal: React.FC<AppModalProps> = ({ isOpen, onClose, onSave, mode, app 
     };
 
     if (!isOpen) {
-        console.log("AppModal not rendering - isOpen is false");
         return null;
     }
 
