@@ -178,7 +178,7 @@ const Applications = () => {
                     }, 1000);
                 }
             })
-            .catch(err => {
+            .catch(_ => {
                 setError(t('applications.errors.copyingTokenFailed'));
             });
     };
@@ -222,7 +222,7 @@ const Applications = () => {
                             >
                                 {hasValidImage(app) ? (
                                     <img
-                                        src={getImageUrl(app.image)}
+                                        src={getImageUrl(app.image) || undefined}
                                         alt={`${app.name} logo`}
                                         className="flex-shrink-0 h-8 w-8 rounded-md object-contain bg-white border border-gray-200"
                                         onError={(e) => {
@@ -292,7 +292,7 @@ const Applications = () => {
                                     {/* Application logo */}
                                     {hasValidImage(selectedApp) ? (
                                         <img
-                                            src={getImageUrl(selectedApp.image)}
+                                            src={getImageUrl(selectedApp.image) || undefined}
                                             alt={`${selectedApp.name} logo`}
                                             className="h-16 w-16 rounded-xl object-contain bg-white border-2 border-white border-opacity-20 shadow-lg"
                                         />
@@ -357,11 +357,11 @@ const Applications = () => {
                                             <div className="flex justify-between">
                                                 <dt className="text-sm font-medium text-gray-500">{t('applications.details.defaultPriority')}</dt>
                                                 <dd className="text-sm text-gray-900">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${selectedApp.defaultPriority >= 7 ? 'bg-red-100 text-red-800' :
-                                                        selectedApp.defaultPriority >= 4 ? 'bg-yellow-100 text-yellow-800' :
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${(selectedApp.defaultPriority || 0) >= 7 ? 'bg-red-100 text-red-800' :
+                                                        (selectedApp.defaultPriority || 0) >= 4 ? 'bg-yellow-100 text-yellow-800' :
                                                             'bg-green-100 text-green-800'
                                                         }`}>
-                                                        {selectedApp.defaultPriority}
+                                                        {selectedApp.defaultPriority || 0}
                                                     </span>
                                                 </dd>
                                             </div>
@@ -406,7 +406,7 @@ const Applications = () => {
                                                         </svg>
                                                     </button>
                                                     <button
-                                                        onClick={() => handleCopyToken(selectedApp.token)}
+                                                        onClick={() => selectedApp.token && handleCopyToken(selectedApp.token)}
                                                         className="ml-1 inline-flex items-center p-2 border border-transparent rounded-md text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                                         title="Copier le token"
                                                     >

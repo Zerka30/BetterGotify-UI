@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmModalProps {
     isOpen: boolean;
@@ -25,6 +26,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     isLoading = false,
     type = 'danger'
 }) => {
+    const { t } = useTranslation();
+
     const getTypeStyles = () => {
         switch (type) {
             case 'danger':

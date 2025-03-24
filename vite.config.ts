@@ -23,8 +23,8 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
-        configure: (proxy, options) => {
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
             proxyReq.removeHeader('origin');
             proxyReq.removeHeader('referer');
 
@@ -35,10 +35,6 @@ export default defineConfig({
               proxyReq.setHeader('Authorization', req.headers.authorization);
             }
 
-          });
-
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('Response Status:', proxyRes.statusCode);
           });
         }
       },

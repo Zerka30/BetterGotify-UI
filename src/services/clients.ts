@@ -4,6 +4,7 @@ export interface Client {
     id: number;
     name: string;
     token: string;
+    lastUsed: Date;
 }
 
 export const clientService = {

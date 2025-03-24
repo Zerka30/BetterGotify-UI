@@ -1,11 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/layout/Navbar';
-import Footer from './components/layout/Footer';
 import Dashboard from './pages/Dashboard';
 import Applications from './pages/Applications';
 import Login from './pages/auth/Login';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import { authService } from './services/auth'
 import Users from './pages/Users';
 import Clients from './pages/Clients';
 function App() {

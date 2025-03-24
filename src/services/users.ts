@@ -4,7 +4,7 @@ export interface User {
     id: number;
     name: string;
     pass: string;
-    role: 'admin' | 'user';
+    admin: boolean;
 }
 
 export const userService = {

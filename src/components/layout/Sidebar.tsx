@@ -26,7 +26,7 @@ const Sidebar = ({
     const location = useLocation();
     const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
     const [isLoadingVersion, setIsLoadingVersion] = useState(false);
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
 
     useEffect(() => {
         const handleResize = () => {

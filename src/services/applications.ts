@@ -7,7 +7,7 @@ export interface Application {
     token?: string;
     internal: boolean;
     image?: string;
-    defaultPriority?: number;
+    defaultPriority?: number | undefined;
     lastUsed?: string;
 }
 

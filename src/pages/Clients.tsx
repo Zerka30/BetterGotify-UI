@@ -117,7 +117,7 @@ const Clients = () => {
         setIsProcessing(true);
         setError(null);
         try {
-            let updatedClient;
+            let updatedClient: Client;
 
             if (modalMode === 'create') {
                 updatedClient = await clientService.createClient(clientName);

@@ -102,7 +102,7 @@ export function I18nProvider({ children }: I18nProviderProps) {
             return key;
         }
         const safeOptions = options ? { ...options } : undefined;
-        return i18next.t(key, safeOptions);
+        return i18next.t(key, safeOptions) as string;
     };
 
     return React.createElement(

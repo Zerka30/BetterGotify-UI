@@ -56,7 +56,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
             if (!password.trim()) {
                 setError(t('users.errors.password'));
                 return false;
-            } a
+            }
 
             if (password !== confirmPassword) {
                 setError(t('users.errors.passwordMismatch'));
@@ -81,12 +81,12 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, mode,
                 await userService.createUser({
                     name,
                     pass: password,
-                    admin: isAdmin
+                    role: isAdmin ? 'admin' : 'user'
                 });
             } else if (mode === 'edit' && user) {
                 const updateData: any = {
                     name,
-                    admin: isAdmin
+                    role: isAdmin ? 'admin' : 'user'
                 };
 
                 // Only include password if it was changed

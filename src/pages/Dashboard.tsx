@@ -78,7 +78,7 @@ const Dashboard = () => {
                 return { ...message, application: app };
             });
 
-            setMessages(enrichedMessages);
+            setMessages(enrichedMessages as Message[]);
         } catch (err) {
             const errorMessage = err instanceof ApiError
                 ? t('common.error') + ' ' + err.status + ': ' + err.message
@@ -289,7 +289,7 @@ const Dashboard = () => {
                         >
                             {hasValidImage(app) ? (
                                 <img
-                                    src={getImageUrl(app.image)}
+                                    src={getImageUrl(app.image) || undefined}
                                     alt={`${app.name} logo`}
                                     className="flex-shrink-0 h-8 w-8 rounded-md object-contain bg-white border border-gray-200"
                                 />
@@ -425,7 +425,7 @@ const Dashboard = () => {
                                             {/* Application logo/avatar */}
                                             {app && hasValidImage(app) ? (
                                                 <img
-                                                    src={getImageUrl(app.image)}
+                                                    src={getImageUrl(app.image) || undefined}
                                                     alt={`${app.name || 'App'} logo`}
                                                     className="flex-shrink-0 h-12 w-12 rounded-md object-contain bg-white border border-gray-200"
                                                     onError={(e) => {
