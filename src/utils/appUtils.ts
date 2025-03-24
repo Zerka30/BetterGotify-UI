@@ -22,7 +22,12 @@ export const getImageUrl = (imagePath: string | undefined) => {
     if (!imagePath) return null;
     if (imagePath === 'static/defaultapp.png') return null;
     if (imagePath.startsWith('http')) return imagePath;
-    return `https://gotify.zerka.dev/${imagePath}`;
+
+    if (imagePath.startsWith('image/')) {
+        return `/${imagePath}`;
+    }
+
+    return `/image/${imagePath}`;
 };
 
 export const hasValidImage = (app: any) => {
