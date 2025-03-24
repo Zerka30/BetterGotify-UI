@@ -42,11 +42,11 @@ const Navbar = ({
     };
 
     const navItems = [
-        { name: 'Messages', path: '/' },
-        { name: 'Utilisateurs', path: '/users' },
-        { name: 'Applications', path: '/apps' },
-        { name: 'Clients', path: '/clients' },
-        { name: 'Plugins', path: '/plugins' },
+        { name: t('navigation.messages'), path: '/' },
+        { name: t('navigation.users'), path: '/users' },
+        { name: t('navigation.applications'), path: '/apps' },
+        { name: t('navigation.clients'), path: '/clients' },
+        { name: t('navigation.plugins'), path: '/plugins' },
     ];
 
     const isActive = (path: string) => {
@@ -111,7 +111,7 @@ const Navbar = ({
                             onClick={handleLogout}
                             className="hidden md:block bg-blue-700 hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium"
                         >
-                            Déconnexion
+                            {t('auth.logout')}
                         </button>
                     </div>
                 </div>
@@ -149,7 +149,7 @@ const Navbar = ({
                             onClick={handleLogout}
                             className="w-full text-left mt-2 px-3 py-2 rounded-md text-base font-medium bg-blue-700 text-white hover:bg-blue-800"
                         >
-                            Déconnexion
+                            {t('auth.logout')}
                         </button>
                     </div>
                 </div>

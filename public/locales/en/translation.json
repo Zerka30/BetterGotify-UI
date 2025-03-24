@@ -1,4 +1,11 @@
 {
+    "navigation": {
+        "messages": "Messages",
+        "users": "Users",
+        "applications": "Applications",
+        "clients": "Clients",
+        "plugins": "Plugins"
+    },
     "footer": {
         "copyright": "© {{year}} BetterGotify UI. All rights reserved.",
         "version": "Server version: v{{version}}"

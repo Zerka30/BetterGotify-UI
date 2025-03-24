@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../../services/auth';
 import { versionService, VersionInfo } from '../../services/version';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
     children: React.ReactNode;
@@ -25,6 +26,7 @@ const Sidebar = ({
     const location = useLocation();
     const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
     const [isLoadingVersion, setIsLoadingVersion] = useState(false);
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
         const handleResize = () => {
@@ -71,7 +73,7 @@ const Sidebar = ({
 
     const navItems = [
         {
-            name: 'Messages',
+            name: t('navigation.messages'),
             path: '/',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -80,7 +82,7 @@ const Sidebar = ({
             )
         },
         {
-            name: 'Utilisateurs',
+            name: t('navigation.users'),
             path: '/users',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -89,7 +91,7 @@ const Sidebar = ({
             )
         },
         {
-            name: 'Applications',
+            name: t('navigation.applications'),
             path: '/apps',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -98,7 +100,7 @@ const Sidebar = ({
             )
         },
         {
-            name: 'Clients',
+            name: t('navigation.clients'),
             path: '/clients',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -107,7 +109,7 @@ const Sidebar = ({
             )
         },
         {
-            name: 'Plugins',
+            name: t('navigation.plugins'),
             path: '/plugins',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -196,7 +198,7 @@ const Sidebar = ({
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                     </svg>
                                 </span>
-                                Déconnexion
+                                {t('auth.logout')}
                             </button>
                         </nav>
                     </div>
