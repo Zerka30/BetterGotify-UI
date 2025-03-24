@@ -8,7 +8,6 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig*.json ./
 COPY *.config.js vite.config.ts ./
-COPY config.json ./
 
 # Installer les dépendances
 RUN npm install
@@ -29,9 +28,6 @@ FROM nginx:alpine
 
 # Copier les fichiers de build depuis l'étape précédente
 COPY --from=build /app/dist /usr/share/nginx/html
-
-# Copier le fichier de configuration
-COPY --from=build /app/config.json /usr/share/nginx/html/config.json
 
 # Copier la configuration Nginx personnalisée
 COPY nginx.conf /etc/nginx/templates/default.conf.template
