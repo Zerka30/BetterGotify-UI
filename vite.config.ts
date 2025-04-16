@@ -8,8 +8,8 @@ import tailwindcss from '@tailwindcss/vite'
 const commonProxyConfig = {
   target: 'https://gotify.zerka.dev',
   changeOrigin: true,
-  configure: (proxy) => {
-    proxy.on('proxyReq', (proxyReq, req) => {
+  configure: (proxy: any) => {
+    proxy.on('proxyReq', (proxyReq: any, req: any) => {
       // Forward authentication headers
       if (req.headers['x-gotify-key']) {
         proxyReq.setHeader('X-Gotify-Key', req.headers['x-gotify-key']);
@@ -26,7 +26,7 @@ const commonProxyConfig = {
     });
 
     // Add CORS headers for development
-    proxy.on('proxyRes', (proxyRes) => {
+    proxy.on('proxyRes', (proxyRes: any) => {
       proxyRes.headers['Access-Control-Allow-Origin'] = '*';
       proxyRes.headers['Access-Control-Allow-Methods'] = 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS';
       proxyRes.headers['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,X-Gotify-Key';
