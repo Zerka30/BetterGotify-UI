@@ -395,7 +395,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Messages list */}
-                <div className="bg-white rounded-lg shadow mb-16 flex flex-col">
+                <div className="bg-white rounded-lg shadow flex flex-col">
                     <div className="p-4 md:p-6 border-b border-gray-200">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <h2 className="text-xl font-semibold text-gray-900">{t('applications.messages.recentMessages')}</h2>
