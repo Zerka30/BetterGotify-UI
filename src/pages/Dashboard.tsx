@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Message, messageService } from '../services/messages';
 import { Application, applicationService } from '../services/applications';
 import { ApiError } from '../services/api';
@@ -31,6 +31,10 @@ const Dashboard = () => {
 
     // State for application management
     const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+
+    // Scroll to top button state
+    const [showScrollTop, setShowScrollTop] = useState(false);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     // Translation
     const { t } = useTranslation();
@@ -218,6 +222,57 @@ const Dashboard = () => {
             setIsLoading(false);
         }
     };
+
+    // Scroll to top function
+    const scrollToTop = () => {
+        if (window.innerWidth < 768) {
+            // Sur mobile, on fait défiler la page entière
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        } else if (messagesContainerRef.current) {
+            // Sur desktop, on fait défiler le conteneur
+            messagesContainerRef.current.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    // Handle scroll event to show/hide scroll to top button
+    const handleScroll = () => {
+        if (messagesContainerRef.current) {
+            const scrollTop = messagesContainerRef.current.scrollTop;
+            setShowScrollTop(scrollTop > 300);
+        }
+    };
+
+    // Handle window scroll for mobile
+    const handleWindowScroll = () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        setShowScrollTop(scrollTop > 300);
+    };
+
+    // Add scroll event listeners
+    useEffect(() => {
+        const messagesContainer = messagesContainerRef.current;
+
+        // Add container scroll listener for desktop
+        if (messagesContainer) {
+            messagesContainer.addEventListener('scroll', handleScroll);
+        }
+
+        // Add window scroll listener for mobile
+        window.addEventListener('scroll', handleWindowScroll);
+
+        return () => {
+            if (messagesContainer) {
+                messagesContainer.removeEventListener('scroll', handleScroll);
+            }
+            window.removeEventListener('scroll', handleWindowScroll);
+        };
+    }, []);
 
     // Initial loading
     useEffect(() => {
